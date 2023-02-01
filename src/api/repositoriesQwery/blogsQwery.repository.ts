@@ -34,10 +34,11 @@ export class BlogsQweryRepository {
     return result;
   }
 
-  async getBlogByBlogId(blogId: string): Promise<blogViewType> {
+  async getBlogByBlogId(blogId: string): Promise<blogViewType | undefined> {
     const blog = await this.blogModel.findOne({
       _id: new Types.ObjectId(blogId),
     });
+    if (!blog) return undefined;
     return blog.blogMapping(blog); //makeViewBlog(blog);
   }
 }
