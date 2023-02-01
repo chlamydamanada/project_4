@@ -24,6 +24,7 @@ import { AllTestingDataController } from './api/controllers/all-testing-data.con
 
 @Module({
   imports: [
+    //ConfigModule.forRoot(),
     MongooseModule.forRoot(
       'mongodb+srv://admin:12345@cluster0.dzu1h8j.mongodb.net/?retryWrites=true&w=majority',
       { dbName: 'project_4_test' },
