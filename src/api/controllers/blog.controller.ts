@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   Param,
@@ -119,6 +120,7 @@ export class BlogsController {
   }
 
   @Put(':id')
+  @HttpCode(204)
   async updateBlog(
     @Param('id') blogId: string,
     @Body() blogInputModel: blogInputModelType,
@@ -133,13 +135,14 @@ export class BlogsController {
       if (!isBlog) {
         throw new Error('Blog with this id does not exist');
       }
-      return HttpStatus.NO_CONTENT;
+      return;
     } catch (e) {
       return 'blogs/updateBlog ' + e;
     }
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async deleteBlogByBlogId(
     @Param('id') blogId: string,
   ): Promise<string | number> {
@@ -149,7 +152,7 @@ export class BlogsController {
         throw new Error('Blog with this id does not exist in the DB');
       }
       await this.blogsService.deleteBlogByBlogId(blogId);
-      return HttpStatus.NO_CONTENT;
+      return;
     } catch (e) {
       return 'blogs/deleteBlogByBlogId ' + e;
     }

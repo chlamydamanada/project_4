@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
   Post,
@@ -91,6 +92,7 @@ export class PostsController {
     }
   }
   @Put(':id')
+  @HttpCode(204)
   async updatePost(
     @Param('id') postId: string,
     @Body() postInputModel: postInputModelWithBlogIdType,
@@ -111,12 +113,13 @@ export class PostsController {
       if (!isPost) {
         throw new Error('Post with this id does not exist');
       }
-      return HttpStatus.NO_CONTENT;
+      return;
     } catch (e) {
       return 'posts/updatePost' + e;
     }
   }
   @Delete(':id')
+  @HttpCode(204)
   async deletePostByPostId(
     @Param('id') postId: string,
   ): Promise<string | number> {
@@ -124,7 +127,7 @@ export class PostsController {
       const post = await this.postsQweryRepository.getPostByPostId(postId);
       if (!post) return HttpStatus.NOT_FOUND;
       await this.postsService.deletePostByPostId(postId);
-      return HttpStatus.NO_CONTENT;
+      return;
     } catch (e) {
       return 'posts/deletePostByPostId' + e;
     }

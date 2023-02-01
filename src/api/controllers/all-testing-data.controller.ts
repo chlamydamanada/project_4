@@ -1,4 +1,4 @@
-import { Controller, Delete, HttpStatus } from '@nestjs/common';
+import { Controller, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { BlogsService } from '../../application/blogs.service';
 import { PostsService } from '../../application/posts.service';
 import { UsersService } from '../../application/users.service';
@@ -11,14 +11,15 @@ export class AllTestingDataController {
     private readonly usersService: UsersService,
   ) {}
   @Delete()
-  async deleteAllData(): Promise<string | number> {
+  @HttpCode(204)
+  async deleteAllData(): Promise<string> {
     try {
       await Promise.all([
         this.blogsService.deleteAllBlogs(),
         this.postsService.deleteAllPosts(),
         this.usersService.deleteAllUsers(),
       ]);
-      return HttpStatus.NO_CONTENT;
+      return;
     } catch (e) {
       return 'deleteAllData' + e;
     }

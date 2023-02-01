@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
   Post,
@@ -50,12 +51,13 @@ export class UsersController {
     }
   }
   @Delete(':id')
+  @HttpCode(204)
   async deleteUserByUserId(@Param('id') userId: string) {
     try {
       const isUser = await this.usersQweryRepository.getUserByUserId(userId);
       if (!isUser) return HttpStatus.NOT_FOUND;
       await this.usersService.deleteUserById(userId);
-      return HttpStatus.NO_CONTENT;
+      return;
     } catch (e) {
       return 'users/deleteUserByUserId' + e;
     }
