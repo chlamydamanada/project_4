@@ -26,6 +26,7 @@ export class PostsService {
       blogId,
       blogName,
     });
+    newPost.createdAt = new Date().toISOString();
     const newPostId = await this.postsRepository.savePost(newPost);
     return newPostId;
   }

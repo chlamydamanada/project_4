@@ -3,12 +3,11 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   Post,
   Put,
   Query,
+  Res,
 } from '@nestjs/common';
 import { PostsService } from '../../application/posts.service';
 import { PostsQweryRepository } from '../repositoriesQwery/postsQwery.repository';
@@ -18,6 +17,7 @@ import { CommentsQweryRepository } from '../repositoriesQwery/commentsQwery.repo
 import { CommentsViewType } from '../../types/commentsTypes/commentsViewType';
 import { postInputModelWithBlogIdType } from '../../types/postsTypes/postInputModelWithBlogIdType';
 import { BlogsQweryRepository } from '../repositoriesQwery/blogsQwery.repository';
+import { Response } from 'express';
 
 @Controller('posts')
 export class PostsController {
@@ -40,11 +40,15 @@ export class PostsController {
   @Get(':id')
   async getPostByPostId(
     @Param('id') postId: string,
+    @Res() res: Response,
   ): Promise<postViewType | string | number> {
     try {
       const post = await this.postsQweryRepository.getPostByPostId(postId);
-      if (!post) return HttpStatus.NOT_FOUND;
-      return post;
+      if (!post) {
+        res.status(404).send('Post with this id does not exist');
+        return;
+      }
+      res.status(200).send(post);
     } catch (e) {
       return 'posts/getPostByPostId' + e;
     }
@@ -54,15 +58,19 @@ export class PostsController {
   async getAllCommentsByPostId(
     @Param('postId') postId: string,
     @Query() query: postQueryType,
+    @Res() res: Response,
   ): Promise<CommentsViewType | string | number> {
     try {
       const post = await this.postsQweryRepository.getPostByPostId(postId);
-      if (!post) return HttpStatus.NOT_FOUND;
+      if (!post) {
+        res.status(404).send('Post with this id does not exist');
+        return;
+      }
       const allComments = await this.commentsQweryRepository.getAllComments(
         postId,
         query,
       );
-      return allComments;
+      res.status(200).send(allComments);
     } catch (e) {
       return 'posts/getAllCommentsByPostId' + e;
     }
@@ -70,12 +78,16 @@ export class PostsController {
   @Post()
   async createPost(
     @Body() postInputModel: postInputModelWithBlogIdType,
+    @Res() res: Response,
   ): Promise<postViewType | string | number> {
     try {
       const blog = await this.blogsQweryRepository.getBlogByBlogId(
         postInputModel.blogId,
       );
-      if (!blog) return HttpStatus.NOT_FOUND;
+      if (!blog) {
+        res.status(404).send('Blog with this id does not exist');
+        return;
+      }
       const newPostId = await this.postsService.createPost(
         postInputModel.title,
         postInputModel.shortDescription,
@@ -92,16 +104,19 @@ export class PostsController {
     }
   }
   @Put(':id')
-  @HttpCode(204)
   async updatePost(
     @Param('id') postId: string,
     @Body() postInputModel: postInputModelWithBlogIdType,
+    @Res() res: Response,
   ): Promise<string | number> {
     try {
       const blog = await this.blogsQweryRepository.getBlogByBlogId(
         postInputModel.blogId,
       );
-      if (!blog) return HttpStatus.NOT_FOUND;
+      if (!blog) {
+        res.status(404).send('Blog with this id does not exist');
+        return;
+      }
       const isPost = await this.postsService.updatePost(
         postId,
         postInputModel.title,
@@ -111,23 +126,27 @@ export class PostsController {
         blog.name,
       );
       if (!isPost) {
-        throw new Error('Post with this id does not exist');
+        res.status(404).send('Post with this id does not exist');
+        return;
       }
-      return;
+      res.sendStatus(204);
     } catch (e) {
       return 'posts/updatePost' + e;
     }
   }
   @Delete(':id')
-  @HttpCode(204)
   async deletePostByPostId(
     @Param('id') postId: string,
+    @Res() res: Response,
   ): Promise<string | number> {
     try {
       const post = await this.postsQweryRepository.getPostByPostId(postId);
-      if (!post) return HttpStatus.NOT_FOUND;
+      if (!post) {
+        res.status(404).send('Post with this id does not exist');
+        return;
+      }
       await this.postsService.deletePostByPostId(postId);
-      return;
+      res.sendStatus(204);
     } catch (e) {
       return 'posts/deletePostByPostId' + e;
     }

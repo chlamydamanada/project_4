@@ -14,7 +14,7 @@ export class User {
   @Prop({ required: true })
   passwordHash: string;
 
-  @Prop({ default: new Date().toISOString() })
+  @Prop({ required: true })
   createdAt: string;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

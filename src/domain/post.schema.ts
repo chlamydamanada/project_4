@@ -20,7 +20,7 @@ export class Post {
   @Prop({ required: true })
   blogName: string;
 
-  @Prop({ default: new Date().toISOString() })
+  @Prop({ required: true })
   createdAt: string;
 }
 

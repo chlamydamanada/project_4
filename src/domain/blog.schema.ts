@@ -14,7 +14,7 @@ export class Blog {
   @Prop({ required: true })
   websiteUrl: string;
 
-  @Prop({ default: new Date().toISOString() })
+  @Prop({ required: true })
   createdAt: string;
 
   blogMapping(blog) {

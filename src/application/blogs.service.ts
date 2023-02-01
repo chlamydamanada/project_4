@@ -14,6 +14,7 @@ export class BlogsService {
 
   async createBlog(blogDTO: blogInputModelType): Promise<string> {
     const newBlog = new this.blogModel(blogDTO);
+    newBlog.createdAt = new Date().toISOString();
     const newBlogId = await this.blogsRepository.saveBlog(newBlog);
     return newBlogId;
   }

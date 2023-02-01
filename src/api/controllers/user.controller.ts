@@ -3,11 +3,10 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   Post,
   Query,
+  Res,
 } from '@nestjs/common';
 import { UsersService } from '../../application/users.service';
 import { UsersQweryRepository } from '../repositoriesQwery/usersQwery.repository';
@@ -15,6 +14,7 @@ import { UsersRepository } from '../../repositories/users.repository';
 import { userQueryType } from '../../types/usersTypes/userQweryType';
 import { UserInputModelType } from '../../types/usersTypes/userInputModelType';
 import { UsersViewType } from '../../types/usersTypes/usersViewType';
+import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -51,13 +51,15 @@ export class UsersController {
     }
   }
   @Delete(':id')
-  @HttpCode(204)
-  async deleteUserByUserId(@Param('id') userId: string) {
+  async deleteUserByUserId(@Param('id') userId: string, @Res() res: Response) {
     try {
       const isUser = await this.usersQweryRepository.getUserByUserId(userId);
-      if (!isUser) return HttpStatus.NOT_FOUND;
+      if (!isUser) {
+        res.status(404).send('User with this id does not exist');
+        return;
+      }
       await this.usersService.deleteUserById(userId);
-      return;
+      res.sendStatus(204);
     } catch (e) {
       return 'users/deleteUserByUserId' + e;
     }

@@ -12,6 +12,7 @@ export class UsersService {
   ) {}
   async createUser(login: string, email: string, password: string) {
     const newUser = new this.userModel({ login, email, password });
+    newUser.createdAt = new Date().toISOString();
     const newUserId = await this.usersRepository.saveUser(newUser);
     return newUserId;
   }

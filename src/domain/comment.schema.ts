@@ -16,7 +16,7 @@ export class Comment {
   @Prop({ required: true })
   userLogin: string;
 
-  @Prop({ default: new Date().toISOString() })
+  @Prop({ required: true })
   createdAt: string;
 }
 export const CommentSchema = SchemaFactory.createForClass(Comment);
