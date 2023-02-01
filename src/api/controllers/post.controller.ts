@@ -98,7 +98,7 @@ export class PostsController {
       const newPost = await this.postsQweryRepository.getPostByPostId(
         newPostId,
       );
-      return newPost;
+      res.status(201).send(newPost);
     } catch (e) {
       return 'posts/createPost' + e;
     }

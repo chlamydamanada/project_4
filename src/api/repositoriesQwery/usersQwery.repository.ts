@@ -33,10 +33,11 @@ export class UsersQweryRepository {
     );
     return result;
   }
-  async getUserByUserId(userId: string): Promise<UserViewType> {
+  async getUserByUserId(userId: string): Promise<UserViewType | undefined> {
     const user = await this.userModel.findOne({
       _id: new Types.ObjectId(userId),
     });
+    if (!user) return undefined;
     return makeViewUser(user);
   }
 }
