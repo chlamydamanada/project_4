@@ -16,6 +16,13 @@ export class User {
 
   @Prop({ required: true })
   createdAt: string;
+
+  generatePasswordHash(password) {
+    this.passwordHash = password;
+  }
 }
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.methods = {
+  generatePasswordHash: User.prototype.generatePasswordHash,
+};
 export const UserModel = { name: User.name, schema: UserSchema };
