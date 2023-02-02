@@ -80,6 +80,7 @@ export class BlogsController {
         query,
       );
       res.status(200).send(posts);
+      return;
     } catch (e) {
       return 'blogs/getAllPostsByBlogId' + e;
     }
@@ -123,6 +124,7 @@ export class BlogsController {
         newPostId,
       );
       res.status(201).send(newPost);
+      return;
     } catch (e) {
       return 'blogs/createPostByBlogId ' + e;
     }

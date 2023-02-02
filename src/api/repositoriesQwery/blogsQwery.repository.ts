@@ -8,6 +8,7 @@ import { Model, Types } from 'mongoose';
 import { sortingQueryFields } from '../../helpers/qweryFilter';
 import { makeNameFilter } from '../../helpers/nameFilter';
 import { makeViewBlogs } from '../../helpers/makerViewBlogs';
+import { makeViewBlog } from '../../helpers/makerViewBlog';
 
 @Injectable()
 export class BlogsQweryRepository {
@@ -39,6 +40,6 @@ export class BlogsQweryRepository {
       _id: new Types.ObjectId(blogId),
     });
     if (!blog) return undefined;
-    return blog.blogMapping(blog); //makeViewBlog(blog);
+    return makeViewBlog(blog);
   }
 }
