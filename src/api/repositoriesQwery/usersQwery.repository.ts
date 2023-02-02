@@ -21,7 +21,7 @@ export class UsersQweryRepository {
     );
     const totalCount = await this.userModel.count(loginOrEmailFilter);
     const users = await this.userModel
-      .find({ loginOrEmailFilter })
+      .find(loginOrEmailFilter)
       .sort({ [queryFilter.sortBy]: queryFilter.sortDirection })
       .skip((queryFilter.pageNumber - 1) * queryFilter.pageSize)
       .limit(queryFilter.pageSize);
