@@ -50,7 +50,7 @@ export class PostsQweryRepository {
     return result;
   }
 
-  async getPostByPostId(postId: string): Promise<postViewType> {
+  async getPostByPostId(postId: string): Promise<postViewType | undefined> {
     const post = await this.postModel.findOne({
       _id: new Types.ObjectId(postId),
     });

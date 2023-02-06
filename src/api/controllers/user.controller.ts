@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -45,21 +46,22 @@ export class UsersController {
       const newUser = await this.usersQweryRepository.getUserByUserId(
         newUserId,
       );
-      return newUser;
+      return newUser!;
     } catch (e) {
       return 'users/createUser' + e;
     }
   }
   @Delete(':id')
-  async deleteUserByUserId(@Param('id') userId: string, @Res() res: Response) {
+  async deleteUserByUserId(
+    @Param('id') userId: string,
+  ): Promise<void | string> {
     try {
       const isUser = await this.usersQweryRepository.getUserByUserId(userId);
-      if (!isUser) {
-        res.status(404).send('User with this id does not exist');
-        return;
-      }
+      if (!isUser)
+        throw new NotFoundException('User with this id does not exist');
+
       await this.usersService.deleteUserById(userId);
-      res.sendStatus(204);
+      return;
     } catch (e) {
       return 'users/deleteUserByUserId' + e;
     }

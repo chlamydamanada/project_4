@@ -3,11 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  NotFoundException,
   Param,
   Post,
   Put,
   Query,
-  Res,
 } from '@nestjs/common';
 import { BlogsService } from '../../application/blogs.service';
 import { BlogsQweryRepository } from '../repositoriesQwery/blogsQwery.repository';
@@ -21,7 +22,6 @@ import { postInputModelType } from '../../types/postsTypes/postInputModelType';
 import { postViewType } from '../../types/postsTypes/postViewType';
 import { PostsService } from '../../application/posts.service';
 import { postQueryType } from '../../types/postsTypes/postsQweryType';
-import { Response } from 'express';
 
 @Controller('blogs')
 export class BlogsController {
@@ -48,15 +48,12 @@ export class BlogsController {
   async getBlogByBlogId(
     @Param('id')
     blogId: string,
-    @Res() res: Response,
-  ): Promise<blogViewType | any> {
+  ): Promise<blogViewType | string> {
     try {
       const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
-      if (!blog) {
-        res.status(404).send('Blog with this id does not exist');
-        return;
-      }
-      res.status(200).send(blog);
+      if (!blog)
+        throw new NotFoundException('Blog with this id does not exist');
+      return blog;
     } catch (e) {
       return 'blogs/getBlogByBlogId' + e;
     }
@@ -66,21 +63,17 @@ export class BlogsController {
   async getAllPostsByBlogId(
     @Param('blogId') blogId: string,
     @Query() query: postQueryType,
-    @Res() res: Response,
   ): Promise<postsViewType | string> {
     try {
       const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
-      if (!blog) {
-        res.status(404).send('Blog with this id does not exist');
-        return;
-      }
+      if (!blog)
+        throw new NotFoundException('Blog with this id does not exist');
 
       const posts = await this.postsQweryRepository.getAllPostsByBlogId(
         blogId,
         query,
       );
-      res.status(200).send(posts);
-      return;
+      return posts;
     } catch (e) {
       return 'blogs/getAllPostsByBlogId' + e;
     }
@@ -95,7 +88,7 @@ export class BlogsController {
       const newBlog = await this.blogsQweryRepository.getBlogByBlogId(
         newBlogId,
       );
-      return newBlog;
+      return newBlog!;
     } catch (e) {
       return 'blogs/createBlog ' + e;
     }
@@ -105,14 +98,11 @@ export class BlogsController {
   async createPostByBlogId(
     @Param('blogId') blogId: string,
     @Body() postInputModel: postInputModelType,
-    @Res() res: Response,
   ): Promise<postViewType | string> {
     try {
       const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
-      if (!blog) {
-        res.status(404).send('Blog with this id does not exist');
-        return;
-      }
+      if (!blog)
+        throw new NotFoundException('Blog with this id does not exist');
       const newPostId = await this.postsService.createPost(
         postInputModel.title,
         postInputModel.shortDescription,
@@ -123,19 +113,18 @@ export class BlogsController {
       const newPost = await this.postsQweryRepository.getPostByPostId(
         newPostId,
       );
-      res.status(201).send(newPost);
-      return;
+      return newPost!;
     } catch (e) {
       return 'blogs/createPostByBlogId ' + e;
     }
   }
 
   @Put(':id')
+  @HttpCode(204)
   async updateBlog(
     @Param('id') blogId: string,
     @Body() blogInputModel: blogInputModelType,
-    @Res() res: Response,
-  ): Promise<string | number> {
+  ): Promise<string | void> {
     try {
       const isBlog = await this.blogsService.updateBlog(
         blogId,
@@ -143,29 +132,24 @@ export class BlogsController {
         blogInputModel.description,
         blogInputModel.websiteUrl,
       );
-      if (!isBlog) {
-        res.status(404).send('Blog with this id does not exist');
-        return;
-      }
-      res.sendStatus(204);
+      if (!isBlog)
+        throw new NotFoundException('Blog with this id does not exist');
+      return;
     } catch (e) {
       return 'blogs/updateBlog ' + e;
     }
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async deleteBlogByBlogId(
     @Param('id') blogId: string,
-    @Res() res: Response,
-  ): Promise<string | number> {
+  ): Promise<string | void> {
     try {
       const isBlog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
-      if (!isBlog) {
-        res.status(404).send('Blog with this id does not exist');
-        return;
-      }
+      if (!isBlog)
+        throw new NotFoundException('Blog with this id does not exist');
       await this.blogsService.deleteBlogByBlogId(blogId);
-      res.sendStatus(204);
     } catch (e) {
       return 'blogs/deleteBlogByBlogId ' + e;
     }

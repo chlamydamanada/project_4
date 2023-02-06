@@ -11,10 +11,10 @@ async function bootstrap() {
       stopAtFirstError: true,
       exceptionFactory: (errors) => {
         const result = errors.map((e) => ({
-          message: e.constraints,
+          message: Object.values(e.constraints!)[0],
           field: e.property,
         }));
-        throw new BadRequestException({ errors: result });
+        throw new BadRequestException({ errorsMessages: result });
       },
     }),
   );

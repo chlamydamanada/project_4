@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -40,15 +42,12 @@ export class PostsController {
   @Get(':id')
   async getPostByPostId(
     @Param('id') postId: string,
-    @Res() res: Response,
   ): Promise<postViewType | string | number> {
     try {
       const post = await this.postsQweryRepository.getPostByPostId(postId);
-      if (!post) {
-        res.status(404).send('Post with this id does not exist');
-        return;
-      }
-      res.status(200).send(post);
+      if (!post)
+        throw new NotFoundException('Post with this id does not exist');
+      return post;
     } catch (e) {
       return 'posts/getPostByPostId' + e;
     }
@@ -59,18 +58,16 @@ export class PostsController {
     @Param('postId') postId: string,
     @Query() query: postQueryType,
     @Res() res: Response,
-  ): Promise<CommentsViewType | string | number> {
+  ): Promise<CommentsViewType | string> {
     try {
       const post = await this.postsQweryRepository.getPostByPostId(postId);
-      if (!post) {
-        res.status(404).send('Post with this id does not exist');
-        return;
-      }
+      if (!post)
+        throw new NotFoundException('Post with this id does not exist');
       const allComments = await this.commentsQweryRepository.getAllComments(
         postId,
         query,
       );
-      res.status(200).send(allComments);
+      return allComments;
     } catch (e) {
       return 'posts/getAllCommentsByPostId' + e;
     }
@@ -78,16 +75,13 @@ export class PostsController {
   @Post()
   async createPost(
     @Body() postInputModel: postInputModelWithBlogIdType,
-    @Res() res: Response,
   ): Promise<postViewType | string | number> {
     try {
       const blog = await this.blogsQweryRepository.getBlogByBlogId(
         postInputModel.blogId,
       );
-      if (!blog) {
-        res.status(404).send('Blog with this id does not exist');
-        return;
-      }
+      if (!blog)
+        throw new NotFoundException('Blog with this id does not exist');
       const newPostId = await this.postsService.createPost(
         postInputModel.title,
         postInputModel.shortDescription,
@@ -98,25 +92,24 @@ export class PostsController {
       const newPost = await this.postsQweryRepository.getPostByPostId(
         newPostId,
       );
-      res.status(201).send(newPost);
+      return newPost!;
     } catch (e) {
       return 'posts/createPost' + e;
     }
   }
   @Put(':id')
+  @HttpCode(204)
   async updatePost(
     @Param('id') postId: string,
     @Body() postInputModel: postInputModelWithBlogIdType,
-    @Res() res: Response,
-  ): Promise<string | number> {
+  ): Promise<string | void> {
     try {
       const blog = await this.blogsQweryRepository.getBlogByBlogId(
         postInputModel.blogId,
       );
-      if (!blog) {
-        res.status(404).send('Blog with this id does not exist');
-        return;
-      }
+      if (!blog)
+        throw new NotFoundException('Blog with this id does not exist');
+
       const isPost = await this.postsService.updatePost(
         postId,
         postInputModel.title,
@@ -125,28 +118,24 @@ export class PostsController {
         postInputModel.blogId,
         blog.name,
       );
-      if (!isPost) {
-        res.status(404).send('Post with this id does not exist');
-        return;
-      }
-      res.sendStatus(204);
+      if (!isPost)
+        throw new NotFoundException('Post with this id does not exist');
+      return;
     } catch (e) {
       return 'posts/updatePost' + e;
     }
   }
   @Delete(':id')
+  @HttpCode(204)
   async deletePostByPostId(
     @Param('id') postId: string,
-    @Res() res: Response,
-  ): Promise<string | number> {
+  ): Promise<string | void> {
     try {
       const post = await this.postsQweryRepository.getPostByPostId(postId);
-      if (!post) {
-        res.status(404).send('Post with this id does not exist');
-        return;
-      }
+      if (!post)
+        throw new NotFoundException('Post with this id does not exist');
       await this.postsService.deletePostByPostId(postId);
-      res.sendStatus(204);
+      return;
     } catch (e) {
       return 'posts/deletePostByPostId' + e;
     }

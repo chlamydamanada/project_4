@@ -49,13 +49,13 @@ $ yarn run start:prod
 
 ```bash
 # unit tests
-$ yarn run test
+$ yarn run __test__
 
 # e2e tests
-$ yarn run test:e2e
+$ yarn run __test__:e2e
 
-# test coverage
-$ yarn run test:cov
+# __test__ coverage
+$ yarn run __test__:cov
 ```
 
 ## Support

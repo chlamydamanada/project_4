@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { ConfigModule } from '@nestjs/config';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BlogsController } from './api/controllers/blog.controller';
@@ -24,11 +25,11 @@ import { AllTestingDataController } from './api/controllers/all-testing-data.con
 
 @Module({
   imports: [
-    //ConfigModule.forRoot(),
-    MongooseModule.forRoot(
-      'mongodb+srv://admin:12345@cluster0.dzu1h8j.mongodb.net/?retryWrites=true&w=majority',
-      { dbName: 'project_4_test' },
-    ),
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
+    MongooseModule.forRoot(process.env.MONGO_URL!),
     MongooseModule.forFeature([BlogModel, PostModel, UserModel, CommentModel]),
   ],
   controllers: [
