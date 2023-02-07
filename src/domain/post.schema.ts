@@ -22,6 +22,18 @@ export class Post {
 
   @Prop({ required: true })
   createdAt: string;
+
+  //createPost();
+
+  /*checkIsPostOwenedByBlogOrThrow(blogId) {
+    if (blogId !== this.blogId) {
+      throw new ForbiddenException('post...');
+    }
+  }
+
+  updatePost(blog: BlogEntity, postDto) {
+    this.checkIsPostOwenedByBlogOrThrow(blog.id);
+  }*/
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

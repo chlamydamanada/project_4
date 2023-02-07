@@ -13,8 +13,8 @@ export class BlogsService {
   ) {}
 
   async createBlog(blogDTO: blogInputModelType): Promise<string> {
-    const newBlog = new this.blogModel(blogDTO);
-    newBlog.createdAt = new Date().toISOString();
+    const newBlog = new this.blogModel();
+    newBlog.createBlog(blogDTO);
     const newBlogId = await this.blogsRepository.saveBlog(newBlog);
     return newBlogId;
   }
@@ -27,9 +27,7 @@ export class BlogsService {
   ): Promise<boolean> {
     const blog = await this.blogsRepository.findBlogById(blogId);
     if (!blog) return false;
-    blog.name = name;
-    blog.description = description;
-    blog.websiteUrl = websiteUrl;
+    blog.updateBlog(name, description, websiteUrl);
     await this.blogsRepository.saveBlog(blog);
     return true;
   }

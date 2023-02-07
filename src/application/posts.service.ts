@@ -25,8 +25,8 @@ export class PostsService {
       content,
       blogId,
       blogName,
+      createdAt: new Date().toISOString(),
     });
-    newPost.createdAt = new Date().toISOString();
     const newPostId = await this.postsRepository.savePost(newPost);
     return newPostId;
   }
@@ -39,7 +39,9 @@ export class PostsService {
     blogId: string,
     blogName: string,
   ): Promise<boolean> {
+    // find blog by id
     const post = await this.postsRepository.findPostById(postId);
+    // if(!blog) return false;
     if (!post) return false;
     post.title = title;
     post.shortDescription = shortDescription;

@@ -17,19 +17,26 @@ export class Blog {
   @Prop({ required: true })
   createdAt: string;
 
-  blogMapping(blog) {
-    return {
-      id: blog._id.toString(),
-      name: blog.name,
-      description: blog.description,
-      websiteUrl: blog.websiteUrl,
-      createdAt: blog.createdAt,
-    };
+  @Prop({ required: true })
+  isMembership: boolean;
+
+  createBlog(blogDto) {
+    this.name = blogDto.name;
+    this.description = blogDto.description;
+    this.websiteUrl = blogDto.websiteUrl;
+    this.createdAt = new Date().toISOString();
+    this.isMembership = true;
+  }
+  updateBlog(name, description, websiteUrl) {
+    this.name = name;
+    this.description = description;
+    this.websiteUrl = websiteUrl;
   }
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);
 BlogSchema.methods = {
-  blogMapping: Blog.prototype.blogMapping,
+  createBlog: Blog.prototype.createBlog,
+  updateBlog: Blog.prototype.updateBlog,
 };
 export const BlogModel = { name: Blog.name, schema: BlogSchema };

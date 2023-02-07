@@ -89,7 +89,10 @@ export class BlogsController {
         newBlogId,
       );
       return newBlog!;
-    } catch (e) {
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        //if (e.message === 'Bad Request') throw new NotFoundException();
+      }
       return 'blogs/createBlog ' + e;
     }
   }
