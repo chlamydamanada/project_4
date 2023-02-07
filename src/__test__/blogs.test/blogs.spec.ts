@@ -146,9 +146,45 @@ describe('AppController', () => {
           });
         });
       });
-    });
-    afterAll(async () => {
-      await app.close();
+      describe('CREATE -> GET -> DELETE -> GET blog with correct data and return not found', () => {
+        let blogId: string | null = null;
+        it('should create correct blog and return it: STATUS 201', async () => {
+          const newBlog = await request(server)
+            .post('/blogs')
+            .send(blogsData.validBlog_4)
+            .expect(201);
+
+          blogId = newBlog.body.id;
+
+          expect(newBlog.body).toEqual({
+            id: expect.any(String),
+            ...blogsData.validBlog_4,
+            createdAt: expect.any(String),
+          });
+        });
+        it('should return new blog by blogId: STATUS 200', async () => {
+          const blog = await request(server)
+            .get(`/blogs/${blogId}`)
+            .expect(200);
+
+          expect(blog.body).toEqual({
+            id: blogId,
+            ...blogsData.validBlog_4,
+            createdAt: expect.any(String),
+          });
+        });
+        it('should delete blog by id: STATUS 204', async () => {
+          await request(server).delete(`/blogs/${blogId}`).expect(204);
+        });
+        it('shouldn`t return new blog by blogId: STATUS 404', async () => {
+          const blog = await request(server)
+            .get(`/blogs/${blogId}`)
+            .expect(404);
+        });
+      });
+      afterAll(async () => {
+        await app.close();
+      });
     });
   });
 });

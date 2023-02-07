@@ -48,15 +48,22 @@ export class BlogsController {
   async getBlogByBlogId(
     @Param('id')
     blogId: string,
-  ): Promise<blogViewType | string> {
-    try {
-      const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
-      if (!blog)
-        throw new NotFoundException('Blog with this id does not exist');
-      return blog;
-    } catch (e) {
-      return 'blogs/getBlogByBlogId' + e;
+  ): Promise<blogViewType | string | void> {
+    //try {
+    const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
+    if (!blog) {
+      throw new NotFoundException('Blog with this id does not exist');
+      return;
     }
+
+    return blog;
+    //} catch (e: unknown) {
+    //  if (e instanceof Error) {
+    //    if (e.message === 'Blog with this id does not exist')
+    //      throw new NotFoundException('Blog with this id does not exist');
+    // }
+    // return;
+    //}
   }
 
   @Get(':blogId/posts')
@@ -64,19 +71,18 @@ export class BlogsController {
     @Param('blogId') blogId: string,
     @Query() query: postQueryType,
   ): Promise<postsViewType | string> {
-    try {
-      const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
-      if (!blog)
-        throw new NotFoundException('Blog with this id does not exist');
+    //try {
+    const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
+    if (!blog) throw new NotFoundException('Blog with this id does not exist');
 
-      const posts = await this.postsQweryRepository.getAllPostsByBlogId(
-        blogId,
-        query,
-      );
-      return posts;
-    } catch (e) {
-      return 'blogs/getAllPostsByBlogId' + e;
-    }
+    const posts = await this.postsQweryRepository.getAllPostsByBlogId(
+      blogId,
+      query,
+    );
+    return posts;
+    //} catch (e) {
+    // return 'blogs/getAllPostsByBlogId' + e;
+    //}
   }
 
   @Post()
@@ -150,9 +156,13 @@ export class BlogsController {
   ): Promise<string | void> {
     try {
       const isBlog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
-      if (!isBlog)
+      if (!isBlog) {
         throw new NotFoundException('Blog with this id does not exist');
+        return;
+      }
+
       await this.blogsService.deleteBlogByBlogId(blogId);
+      return;
     } catch (e) {
       return 'blogs/deleteBlogByBlogId ' + e;
     }
