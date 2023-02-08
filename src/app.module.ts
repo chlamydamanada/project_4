@@ -22,6 +22,8 @@ import { UserModel } from './domain/user.schema';
 import { CommentModel } from './domain/comment.schema';
 import { PostsRepository } from './repositories/posts.repository';
 import { AllTestingDataController } from './api/controllers/all-testing-data.controller';
+import { CommentService } from './application/comments.service';
+import { CommentsRepository } from './repositories/comments.repository';
 
 @Module({
   imports: [
@@ -45,11 +47,13 @@ import { AllTestingDataController } from './api/controllers/all-testing-data.con
     BlogsService,
     PostsService,
     UsersService,
+    CommentService,
     BlogsQweryRepository,
     BlogsRepository,
     PostsQweryRepository,
     PostsRepository,
     CommentsQweryRepository,
+    CommentsRepository,
     UsersQweryRepository,
     UsersRepository,
   ],

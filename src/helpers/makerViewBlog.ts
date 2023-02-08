@@ -7,5 +7,6 @@ export const makeViewBlog = (blog: BlogEntity) => {
     description: blog.description,
     websiteUrl: blog.websiteUrl,
     createdAt: blog.createdAt,
+    isMembership: true,
   };
 };

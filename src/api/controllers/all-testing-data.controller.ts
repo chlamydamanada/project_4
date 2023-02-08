@@ -2,6 +2,7 @@ import { Controller, Delete, HttpCode } from '@nestjs/common';
 import { BlogsService } from '../../application/blogs.service';
 import { PostsService } from '../../application/posts.service';
 import { UsersService } from '../../application/users.service';
+import { CommentsRepository } from '../../repositories/comments.repository';
 
 @Controller('testing/all-data')
 export class AllTestingDataController {
@@ -9,6 +10,7 @@ export class AllTestingDataController {
     private readonly blogsService: BlogsService,
     private readonly postsService: PostsService,
     private readonly usersService: UsersService,
+    private readonly commentsRepository: CommentsRepository,
   ) {}
   @Delete()
   @HttpCode(204)
@@ -17,6 +19,7 @@ export class AllTestingDataController {
       this.blogsService.deleteAllBlogs(),
       this.postsService.deleteAllPosts(),
       this.usersService.deleteAllUsers(),
+      this.commentsRepository.deleteAllComments(),
     ]);
     return;
   }

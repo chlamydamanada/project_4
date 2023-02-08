@@ -1,11 +1,23 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Put,
+} from '@nestjs/common';
 import { CommentsQweryRepository } from '../repositoriesQwery/commentsQwery.repository';
 import { CommentViewType } from '../../types/commentsTypes/commentViewType';
+import { commentInputDtoType } from '../../types/commentsTypes/commentInputDtoPipe';
+import { CommentService } from '../../application/comments.service';
 
 @Controller('comments')
 export class CommentsContoller {
   constructor(
     private readonly commentsQweryRepository: CommentsQweryRepository,
+    private readonly commentService: CommentService,
   ) {}
   @Get(':id')
   async getCommentByCommentId(
@@ -17,5 +29,21 @@ export class CommentsContoller {
     if (!comment)
       throw new NotFoundException('Comment with this id does not exist');
     return comment;
+  }
+  @Put(':id')
+  @HttpCode(204)
+  async updateCommentByCommentId(
+    @Param('id') commentId: string,
+    @Body() commentInputDto: commentInputDtoType,
+  ): Promise<void> {
+    await this.commentService.updateCommentById(commentId, commentInputDto);
+    return;
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async deleteCommentById(@Param('id') commentId: string): Promise<void> {
+    await this.commentService.deleteCommentById(commentId);
+    return;
   }
 }

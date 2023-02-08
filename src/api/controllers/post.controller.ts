@@ -82,19 +82,19 @@ export class PostsController {
   @HttpCode(204)
   async updatePost(
     @Param('id') postId: string,
-    @Body() postInputModel: postInputModelWithBlogIdType,
+    @Body() postInputDto: postInputModelWithBlogIdType,
   ): Promise<string | void> {
     const blog = await this.blogsQweryRepository.getBlogByBlogId(
-      postInputModel.blogId,
+      postInputDto.blogId,
     );
     if (!blog) throw new NotFoundException('Blog with this id does not exist');
 
     const isPost = await this.postsService.updatePost(
       postId,
-      postInputModel.title,
-      postInputModel.shortDescription,
-      postInputModel.content,
-      postInputModel.blogId,
+      postInputDto.title,
+      postInputDto.shortDescription,
+      postInputDto.content,
+      postInputDto.blogId,
       blog.name,
     );
     if (!isPost)
