@@ -24,6 +24,8 @@ import { PostsRepository } from './repositories/posts.repository';
 import { AllTestingDataController } from './api/controllers/all-testing-data.controller';
 import { CommentService } from './application/comments.service';
 import { CommentsRepository } from './repositories/comments.repository';
+import { AuthController } from './api/controllers/auth.controller';
+import { AuthService } from './application/auth.service';
 
 @Module({
   imports: [
@@ -41,9 +43,11 @@ import { CommentsRepository } from './repositories/comments.repository';
     UsersController,
     CommentsContoller,
     AllTestingDataController,
+    AuthController,
   ],
   providers: [
     AppService,
+    AuthService,
     BlogsService,
     PostsService,
     UsersService,

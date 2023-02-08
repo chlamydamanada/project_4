@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserEntity } from '../domain/user.schema';
 import { UsersRepository } from '../repositories/users.repository';
 import bcrypt from 'bcrypt';
+import { UserInputModelType } from '../types/usersTypes/userInputModelType';
 
 @Injectable()
 export class UsersService {
@@ -11,14 +12,16 @@ export class UsersService {
     @InjectModel(User.name) private userModel: Model<UserEntity>,
     private readonly usersRepository: UsersRepository,
   ) {}
-  async createUser(login: string, email: string, password: string) {
-    const newUser = new this.userModel({ login, email, password });
-    newUser.createdAt = new Date().toISOString();
-    newUser.generatePasswordHash(password);
+  async createUser(userInputModel: UserInputModelType) {
+    const newUser = new this.userModel();
+    await newUser.createUser(userInputModel);
     const newUserId = await this.usersRepository.saveUser(newUser);
     return newUserId;
   }
   async deleteUserById(userId: string) {
+    const user = await this.usersRepository.findUserById(userId);
+    if (!user) throw new NotFoundException('User with this id does not exist');
+
     await this.usersRepository.deleteUserById(userId);
     return true;
   }

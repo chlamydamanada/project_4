@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   Post,
@@ -12,8 +13,8 @@ import { UsersService } from '../../application/users.service';
 import { UsersQweryRepository } from '../repositoriesQwery/usersQwery.repository';
 import { UsersRepository } from '../../repositories/users.repository';
 import { userQueryType } from '../../types/usersTypes/userQweryType';
-import { UserInputModelType } from '../../types/usersTypes/userInputModelType';
 import { UsersViewType } from '../../types/usersTypes/usersViewType';
+import { userInputModelPipe } from './pipes/userInputDtoPipe';
 
 @Controller('users')
 export class UsersController {
@@ -31,24 +32,17 @@ export class UsersController {
   }
 
   @Post()
-  async createUser(@Body() userInputModel: UserInputModelType) {
-    const newUserId = await this.usersService.createUser(
-      userInputModel.login,
-      userInputModel.email,
-      userInputModel.password,
-    );
+  async createUser(@Body() userInputModel: userInputModelPipe) {
+    const newUserId = await this.usersService.createUser(userInputModel);
     const newUser = await this.usersQweryRepository.getUserByUserId(newUserId);
     return newUser!;
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async deleteUserByUserId(
     @Param('id') userId: string,
   ): Promise<void | string> {
-    const isUser = await this.usersQweryRepository.getUserByUserId(userId);
-    if (!isUser)
-      throw new NotFoundException('User with this id does not exist');
-
     await this.usersService.deleteUserById(userId);
     return;
   }

@@ -30,4 +30,14 @@ export class UsersRepository {
     await this.userModel.deleteMany({});
     return;
   }
+
+  async findUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<undefined | UserEntity> {
+    const user = await this.userModel.findOne({
+      $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+    });
+    if (!user) return undefined;
+    return user;
+  }
 }

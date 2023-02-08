@@ -1,16 +1,5 @@
-import { IsNotEmpty, IsUrl, Length } from 'class-validator';
-
-export class blogInputModelType {
-  @IsNotEmpty()
-  @Length(3, 15)
+export type blogInputDtoType = {
   name: string;
-
-  @IsNotEmpty()
-  @Length(3, 500)
   description: string;
-
-  @IsUrl()
-  @IsNotEmpty()
-  @Length(5, 100)
   websiteUrl: string;
-}
+};

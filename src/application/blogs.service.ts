@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogEntity } from '../domain/blog.schema';
 import { Model } from 'mongoose';
 import { BlogsRepository } from '../repositories/blogs.repository';
-import { blogInputModelType } from '../types/blogsTypes/blogInputModelType';
+import { blogInputDtoType } from '../types/blogsTypes/blogInputModelType';
 
 @Injectable()
 export class BlogsService {
@@ -12,7 +12,7 @@ export class BlogsService {
     private readonly blogsRepository: BlogsRepository,
   ) {}
 
-  async createBlog(blogDTO: blogInputModelType): Promise<string> {
+  async createBlog(blogDTO: blogInputDtoType): Promise<string> {
     const newBlog = new this.blogModel();
     newBlog.createBlog(blogDTO);
     const newBlogId = await this.blogsRepository.saveBlog(newBlog);

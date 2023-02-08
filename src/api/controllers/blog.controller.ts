@@ -17,11 +17,11 @@ import { blogsViewType } from '../../types/blogsTypes/blogsViewType';
 import { PostsQweryRepository } from '../repositoriesQwery/postsQwery.repository';
 import { postsViewType } from '../../types/postsTypes/postsViewType';
 import { blogQueryType } from '../../types/blogsTypes/blogsQweryType';
-import { blogInputModelType } from '../../types/blogsTypes/blogInputModelType';
 import { postInputModelType } from '../../types/postsTypes/postInputModelType';
 import { postViewType } from '../../types/postsTypes/postViewType';
 import { PostsService } from '../../application/posts.service';
 import { postQueryType } from '../../types/postsTypes/postsQweryType';
+import { blogInputModelPipe } from './pipes/blogInputDtoPipe';
 
 @Controller('blogs')
 export class BlogsController {
@@ -83,7 +83,7 @@ export class BlogsController {
 
   @Post()
   async createBlog(
-    @Body() blogInputModel: blogInputModelType,
+    @Body() blogInputModel: blogInputModelPipe,
   ): Promise<blogViewType | string> {
     const newBlogId = await this.blogsService.createBlog(blogInputModel);
     const newBlog = await this.blogsQweryRepository.getBlogByBlogId(newBlogId);
@@ -118,7 +118,7 @@ export class BlogsController {
   @HttpCode(204)
   async updateBlog(
     @Param('id') blogId: string,
-    @Body() blogInputModel: blogInputModelType,
+    @Body() blogInputModel: blogInputModelPipe,
   ): Promise<string | void> {
     const isBlog = await this.blogsService.updateBlog(
       blogId,
