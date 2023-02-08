@@ -13,15 +13,11 @@ export class AllTestingDataController {
   @Delete()
   @HttpCode(204)
   async deleteAllData(): Promise<string | void> {
-    try {
-      await Promise.all([
-        this.blogsService.deleteAllBlogs(),
-        this.postsService.deleteAllPosts(),
-        this.usersService.deleteAllUsers(),
-      ]);
-      return;
-    } catch (e) {
-      return 'deleteAllData' + e;
-    }
+    await Promise.all([
+      this.blogsService.deleteAllBlogs(),
+      this.postsService.deleteAllPosts(),
+      this.usersService.deleteAllUsers(),
+    ]);
+    return;
   }
 }

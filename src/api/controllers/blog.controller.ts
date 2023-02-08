@@ -71,7 +71,6 @@ export class BlogsController {
     @Param('blogId') blogId: string,
     @Query() query: postQueryType,
   ): Promise<postsViewType | string> {
-    //try {
     const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
     if (!blog) throw new NotFoundException('Blog with this id does not exist');
 
@@ -80,27 +79,21 @@ export class BlogsController {
       query,
     );
     return posts;
-    //} catch (e) {
-    // return 'blogs/getAllPostsByBlogId' + e;
-    //}
   }
 
   @Post()
   async createBlog(
     @Body() blogInputModel: blogInputModelType,
   ): Promise<blogViewType | string> {
-    try {
-      const newBlogId = await this.blogsService.createBlog(blogInputModel);
-      const newBlog = await this.blogsQweryRepository.getBlogByBlogId(
-        newBlogId,
-      );
-      return newBlog!;
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        //if (e.message === 'Bad Request') throw new NotFoundException();
-      }
-      return 'blogs/createBlog ' + e;
-    }
+    const newBlogId = await this.blogsService.createBlog(blogInputModel);
+    const newBlog = await this.blogsQweryRepository.getBlogByBlogId(newBlogId);
+    return newBlog!;
+    // } catch (e: unknown) {
+    //if (e instanceof Error) {
+    //if (e.message === 'Bad Request') throw new NotFoundException();
+    // }
+    // return 'blogs/createBlog ' + e;
+    //}
   }
 
   @Post(':blogId/posts')
@@ -108,24 +101,17 @@ export class BlogsController {
     @Param('blogId') blogId: string,
     @Body() postInputModel: postInputModelType,
   ): Promise<postViewType | string> {
-    try {
-      const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
-      if (!blog)
-        throw new NotFoundException('Blog with this id does not exist');
-      const newPostId = await this.postsService.createPost(
-        postInputModel.title,
-        postInputModel.shortDescription,
-        postInputModel.content,
-        blogId,
-        blog.name,
-      );
-      const newPost = await this.postsQweryRepository.getPostByPostId(
-        newPostId,
-      );
-      return newPost!;
-    } catch (e) {
-      return 'blogs/createPostByBlogId ' + e;
-    }
+    const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
+    if (!blog) throw new NotFoundException('Blog with this id does not exist');
+    const newPostId = await this.postsService.createPost(
+      postInputModel.title,
+      postInputModel.shortDescription,
+      postInputModel.content,
+      blogId,
+      blog.name,
+    );
+    const newPost = await this.postsQweryRepository.getPostByPostId(newPostId);
+    return newPost!;
   }
 
   @Put(':id')
@@ -134,37 +120,24 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Body() blogInputModel: blogInputModelType,
   ): Promise<string | void> {
-    try {
-      const isBlog = await this.blogsService.updateBlog(
-        blogId,
-        blogInputModel.name,
-        blogInputModel.description,
-        blogInputModel.websiteUrl,
-      );
-      if (!isBlog)
-        throw new NotFoundException('Blog with this id does not exist');
-      return;
-    } catch (e) {
-      return 'blogs/updateBlog ' + e;
-    }
+    const isBlog = await this.blogsService.updateBlog(
+      blogId,
+      blogInputModel.name,
+      blogInputModel.description,
+      blogInputModel.websiteUrl,
+    );
+    if (!isBlog)
+      throw new NotFoundException('Blog with this id does not exist');
+    return;
   }
 
   @Delete(':id')
   @HttpCode(204)
-  async deleteBlogByBlogId(
-    @Param('id') blogId: string,
-  ): Promise<string | void> {
-    try {
-      const isBlog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
-      if (!isBlog) {
-        throw new NotFoundException('Blog with this id does not exist');
-        return;
-      }
-
-      await this.blogsService.deleteBlogByBlogId(blogId);
-      return;
-    } catch (e) {
-      return 'blogs/deleteBlogByBlogId ' + e;
-    }
+  async deleteBlogByBlogId(@Param('id') blogId: string): Promise<void> {
+    const isBlog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
+    if (!isBlog)
+      throw new NotFoundException('Blog with this id does not exist');
+    await this.blogsService.deleteBlogByBlogId(blogId);
+    return;
   }
 }

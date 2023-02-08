@@ -31,26 +31,17 @@ export class PostsController {
   ) {}
   @Get()
   async getAllPosts(@Query() query: postQueryType) {
-    try {
-      const posts = await this.postsQweryRepository.getAllPosts(query);
-      return posts;
-    } catch (e) {
-      return 'posts/getAllPosts' + e;
-    }
+    const posts = await this.postsQweryRepository.getAllPosts(query);
+    return posts;
   }
 
   @Get(':id')
   async getPostByPostId(
     @Param('id') postId: string,
   ): Promise<postViewType | string | number> {
-    try {
-      const post = await this.postsQweryRepository.getPostByPostId(postId);
-      if (!post)
-        throw new NotFoundException('Post with this id does not exist');
-      return post;
-    } catch (e) {
-      return 'posts/getPostByPostId' + e;
-    }
+    const post = await this.postsQweryRepository.getPostByPostId(postId);
+    if (!post) throw new NotFoundException('Post with this id does not exist');
+    return post;
   }
 
   @Get(':postId/comments')
@@ -59,85 +50,66 @@ export class PostsController {
     @Query() query: postQueryType,
     @Res() res: Response,
   ): Promise<CommentsViewType | string> {
-    try {
-      const post = await this.postsQweryRepository.getPostByPostId(postId);
-      if (!post)
-        throw new NotFoundException('Post with this id does not exist');
-      const allComments = await this.commentsQweryRepository.getAllComments(
-        postId,
-        query,
-      );
-      return allComments;
-    } catch (e) {
-      return 'posts/getAllCommentsByPostId' + e;
-    }
+    const post = await this.postsQweryRepository.getPostByPostId(postId);
+    if (!post) throw new NotFoundException('Post with this id does not exist');
+    const allComments = await this.commentsQweryRepository.getAllComments(
+      postId,
+      query,
+    );
+    return allComments;
   }
+
   @Post()
   async createPost(
     @Body() postInputModel: postInputModelWithBlogIdType,
   ): Promise<postViewType | string | number> {
-    try {
-      const blog = await this.blogsQweryRepository.getBlogByBlogId(
-        postInputModel.blogId,
-      );
-      if (!blog)
-        throw new NotFoundException('Blog with this id does not exist');
-      const newPostId = await this.postsService.createPost(
-        postInputModel.title,
-        postInputModel.shortDescription,
-        postInputModel.content,
-        postInputModel.blogId,
-        blog.name,
-      );
-      const newPost = await this.postsQweryRepository.getPostByPostId(
-        newPostId,
-      );
-      return newPost!;
-    } catch (e) {
-      return 'posts/createPost' + e;
-    }
+    const blog = await this.blogsQweryRepository.getBlogByBlogId(
+      postInputModel.blogId,
+    );
+    if (!blog) throw new NotFoundException('Blog with this id does not exist');
+    const newPostId = await this.postsService.createPost(
+      postInputModel.title,
+      postInputModel.shortDescription,
+      postInputModel.content,
+      postInputModel.blogId,
+      blog.name,
+    );
+    const newPost = await this.postsQweryRepository.getPostByPostId(newPostId);
+    return newPost!;
   }
+
   @Put(':id')
   @HttpCode(204)
   async updatePost(
     @Param('id') postId: string,
     @Body() postInputModel: postInputModelWithBlogIdType,
   ): Promise<string | void> {
-    try {
-      const blog = await this.blogsQweryRepository.getBlogByBlogId(
-        postInputModel.blogId,
-      );
-      if (!blog)
-        throw new NotFoundException('Blog with this id does not exist');
+    const blog = await this.blogsQweryRepository.getBlogByBlogId(
+      postInputModel.blogId,
+    );
+    if (!blog) throw new NotFoundException('Blog with this id does not exist');
 
-      const isPost = await this.postsService.updatePost(
-        postId,
-        postInputModel.title,
-        postInputModel.shortDescription,
-        postInputModel.content,
-        postInputModel.blogId,
-        blog.name,
-      );
-      if (!isPost)
-        throw new NotFoundException('Post with this id does not exist');
-      return;
-    } catch (e) {
-      return 'posts/updatePost' + e;
-    }
+    const isPost = await this.postsService.updatePost(
+      postId,
+      postInputModel.title,
+      postInputModel.shortDescription,
+      postInputModel.content,
+      postInputModel.blogId,
+      blog.name,
+    );
+    if (!isPost)
+      throw new NotFoundException('Post with this id does not exist');
+    return;
   }
+
   @Delete(':id')
   @HttpCode(204)
   async deletePostByPostId(
     @Param('id') postId: string,
   ): Promise<string | void> {
-    try {
-      const post = await this.postsQweryRepository.getPostByPostId(postId);
-      if (!post)
-        throw new NotFoundException('Post with this id does not exist');
-      await this.postsService.deletePostByPostId(postId);
-      return;
-    } catch (e) {
-      return 'posts/deletePostByPostId' + e;
-    }
+    const post = await this.postsQweryRepository.getPostByPostId(postId);
+    if (!post) throw new NotFoundException('Post with this id does not exist');
+    await this.postsService.deletePostByPostId(postId);
+    return;
   }
 }

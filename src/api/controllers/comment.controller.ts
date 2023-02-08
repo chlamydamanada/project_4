@@ -11,16 +11,11 @@ export class CommentsContoller {
   async getCommentByCommentId(
     @Param('id') commentId: string,
   ): Promise<CommentViewType | string> {
-    try {
-      const comment = await this.commentsQweryRepository.getCommentByCommentId(
-        commentId,
-      );
-      if (!comment)
-        throw new NotFoundException('Comment with this id does not exist');
-
-      return comment;
-    } catch (e) {
-      return 'comments/getCommentByCommentId' + e;
-    }
+    const comment = await this.commentsQweryRepository.getCommentByCommentId(
+      commentId,
+    );
+    if (!comment)
+      throw new NotFoundException('Comment with this id does not exist');
+    return comment;
   }
 }
