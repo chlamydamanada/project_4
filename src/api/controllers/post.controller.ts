@@ -10,6 +10,7 @@ import {
   Put,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from '../../application/posts.service';
 import { PostsQweryRepository } from '../repositoriesQwery/postsQwery.repository';
@@ -20,6 +21,8 @@ import { CommentsViewType } from '../../types/commentsTypes/commentsViewType';
 import { postInputModelWithBlogIdType } from '../../types/postsTypes/postInputModelWithBlogIdType';
 import { BlogsQweryRepository } from '../repositoriesQwery/blogsQwery.repository';
 import { Response } from 'express';
+import { postInputModelIdPipe } from './pipes/postInputDtoPipe';
+import { BasicAuthGuard } from '../guards/auth-guard';
 
 @Controller('posts')
 export class PostsController {
@@ -48,7 +51,6 @@ export class PostsController {
   async getAllCommentsByPostId(
     @Param('postId') postId: string,
     @Query() query: postQueryType,
-    @Res() res: Response,
   ): Promise<CommentsViewType | string> {
     const post = await this.postsQweryRepository.getPostByPostId(postId);
     if (!post) throw new NotFoundException('Post with this id does not exist');
@@ -60,8 +62,9 @@ export class PostsController {
   }
 
   @Post()
+  @UseGuards(BasicAuthGuard)
   async createPost(
-    @Body() postInputModel: postInputModelWithBlogIdType,
+    @Body() postInputModel: postInputModelIdPipe,
   ): Promise<postViewType | string | number> {
     const blog = await this.blogsQweryRepository.getBlogByBlogId(
       postInputModel.blogId,
@@ -79,10 +82,11 @@ export class PostsController {
   }
 
   @Put(':id')
+  @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   async updatePost(
     @Param('id') postId: string,
-    @Body() postInputDto: postInputModelWithBlogIdType,
+    @Body() postInputDto: postInputModelIdPipe,
   ): Promise<string | void> {
     const blog = await this.blogsQweryRepository.getBlogByBlogId(
       postInputDto.blogId,
@@ -103,6 +107,7 @@ export class PostsController {
   }
 
   @Delete(':id')
+  @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   async deletePostByPostId(
     @Param('id') postId: string,

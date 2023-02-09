@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../../application/users.service';
 import { UsersQweryRepository } from '../repositoriesQwery/usersQwery.repository';
@@ -15,6 +16,7 @@ import { UsersRepository } from '../../repositories/users.repository';
 import { userQueryType } from '../../types/usersTypes/userQweryType';
 import { UsersViewType } from '../../types/usersTypes/usersViewType';
 import { userInputModelPipe } from './pipes/userInputDtoPipe';
+import { BasicAuthGuard } from '../guards/auth-guard';
 
 @Controller('users')
 export class UsersController {
@@ -24,6 +26,7 @@ export class UsersController {
     private readonly usersRepository: UsersRepository,
   ) {}
   @Get()
+  @UseGuards(BasicAuthGuard)
   async getAllUsers(
     @Query() query: userQueryType,
   ): Promise<UsersViewType | string> {
@@ -32,6 +35,7 @@ export class UsersController {
   }
 
   @Post()
+  @UseGuards(BasicAuthGuard)
   async createUser(@Body() userInputModel: userInputModelPipe) {
     const newUserId = await this.usersService.createUser(userInputModel);
     const newUser = await this.usersQweryRepository.getUserByUserId(newUserId);
@@ -39,6 +43,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   async deleteUserByUserId(
     @Param('id') userId: string,

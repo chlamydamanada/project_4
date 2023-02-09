@@ -1,5 +1,6 @@
 import {
   Body,
+  CanActivate,
   Controller,
   Delete,
   Get,
@@ -9,6 +10,8 @@ import {
   Post,
   Put,
   Query,
+  SetMetadata,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from '../../application/blogs.service';
 import { BlogsQweryRepository } from '../repositoriesQwery/blogsQwery.repository';
@@ -17,11 +20,12 @@ import { blogsViewType } from '../../types/blogsTypes/blogsViewType';
 import { PostsQweryRepository } from '../repositoriesQwery/postsQwery.repository';
 import { postsViewType } from '../../types/postsTypes/postsViewType';
 import { blogQueryType } from '../../types/blogsTypes/blogsQweryType';
-import { postInputModelType } from '../../types/postsTypes/postInputModelType';
 import { postViewType } from '../../types/postsTypes/postViewType';
 import { PostsService } from '../../application/posts.service';
 import { postQueryType } from '../../types/postsTypes/postsQweryType';
 import { blogInputModelPipe } from './pipes/blogInputDtoPipe';
+import { blogPostInputModelPipe } from './pipes/postInputDtoPipe';
+import { BasicAuthGuard } from '../guards/auth-guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -36,12 +40,8 @@ export class BlogsController {
   async getAllBlogs(
     @Query() query: blogQueryType,
   ): Promise<blogsViewType | string> {
-    try {
-      const blogs = await this.blogsQweryRepository.getAllBlogs(query);
-      return blogs;
-    } catch (e) {
-      return 'blogs/getAllBlogs' + e;
-    }
+    const blogs = await this.blogsQweryRepository.getAllBlogs(query);
+    return blogs;
   }
 
   @Get(':id')
@@ -51,11 +51,7 @@ export class BlogsController {
   ): Promise<blogViewType | string | void> {
     //try {
     const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
-    if (!blog) {
-      throw new NotFoundException('Blog with this id does not exist');
-      return;
-    }
-
+    if (!blog) throw new NotFoundException('Blog with this id does not exist');
     return blog;
     //} catch (e: unknown) {
     //  if (e instanceof Error) {
@@ -82,6 +78,7 @@ export class BlogsController {
   }
 
   @Post()
+  @UseGuards(BasicAuthGuard)
   async createBlog(
     @Body() blogInputModel: blogInputModelPipe,
   ): Promise<blogViewType | string> {
@@ -97,9 +94,10 @@ export class BlogsController {
   }
 
   @Post(':blogId/posts')
+  @UseGuards(BasicAuthGuard)
   async createPostByBlogId(
     @Param('blogId') blogId: string,
-    @Body() postInputModel: postInputModelType,
+    @Body() postInputModel: blogPostInputModelPipe,
   ): Promise<postViewType | string> {
     const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
     if (!blog) throw new NotFoundException('Blog with this id does not exist');
@@ -115,6 +113,7 @@ export class BlogsController {
   }
 
   @Put(':id')
+  @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   async updateBlog(
     @Param('id') blogId: string,
@@ -132,6 +131,7 @@ export class BlogsController {
   }
 
   @Delete(':id')
+  @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   async deleteBlogByBlogId(@Param('id') blogId: string): Promise<void> {
     const isBlog = await this.blogsQweryRepository.getBlogByBlogId(blogId);

@@ -4,6 +4,7 @@ import { UserInputModelType } from '../types/usersTypes/userInputModelType';
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
 import * as bcrypt from 'bcrypt';
+import { emailConfirmation } from '../types/usersTypes/emailConfirmationType';
 
 export type UserEntity = HydratedDocument<User>;
 
@@ -23,12 +24,12 @@ export class User {
 
   @Prop(
     raw({
-      confirmationCode: { type: String },
-      expirationDate: { type: Date },
-      isConfirmed: { type: Boolean },
+      confirmationCode: { required: true, type: String },
+      expirationDate: { required: true, type: Date },
+      isConfirmed: { required: true, type: Boolean },
     }),
   )
-  EmailConfirmation: Record<string, any>;
+  EmailConfirmation: emailConfirmation;
 
   async createUser(userInputModel: UserInputModelType) {
     this.login = userInputModel.login;
