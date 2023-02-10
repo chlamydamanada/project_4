@@ -9,6 +9,8 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       stopAtFirstError: true,
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
       exceptionFactory: (errors) => {
         const result = errors.map((e) => ({
           message: Object.values(e.constraints!)[0],

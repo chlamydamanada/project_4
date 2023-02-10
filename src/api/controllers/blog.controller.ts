@@ -23,9 +23,11 @@ import { blogQueryType } from '../../types/blogsTypes/blogsQweryType';
 import { postViewType } from '../../types/postsTypes/postViewType';
 import { PostsService } from '../../application/posts.service';
 import { postQueryType } from '../../types/postsTypes/postsQweryType';
-import { blogInputModelPipe } from './pipes/blogInputDtoPipe';
-import { blogPostInputModelPipe } from './pipes/postInputDtoPipe';
+import { blogInputModelPipe } from '../pipes/blogs/blogInputDtoPipe';
+import { blogPostInputModelPipe } from '../pipes/posts/postInputDtoPipe';
 import { BasicAuthGuard } from '../guards/auth-guard';
+import { BlogQweryPipe } from '../pipes/blogs/blogQweryPipe';
+import { PostQweryPipe } from '../pipes/posts/postQweryPipe';
 
 @Controller('blogs')
 export class BlogsController {
@@ -38,9 +40,12 @@ export class BlogsController {
 
   @Get()
   async getAllBlogs(
-    @Query() query: blogQueryType,
+    @Query() query: BlogQweryPipe,
   ): Promise<blogsViewType | string> {
-    const blogs = await this.blogsQweryRepository.getAllBlogs(query);
+    console.log('+++++', query);
+    const blogs = await this.blogsQweryRepository.getAllBlogs(
+      query as blogQueryType,
+    );
     return blogs;
   }
 
@@ -65,14 +70,14 @@ export class BlogsController {
   @Get(':blogId/posts')
   async getAllPostsByBlogId(
     @Param('blogId') blogId: string,
-    @Query() query: postQueryType,
+    @Query() query: PostQweryPipe,
   ): Promise<postsViewType | string> {
     const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
     if (!blog) throw new NotFoundException('Blog with this id does not exist');
 
     const posts = await this.postsQweryRepository.getAllPostsByBlogId(
       blogId,
-      query,
+      query as postQueryType,
     );
     return posts;
   }
@@ -99,15 +104,10 @@ export class BlogsController {
     @Param('blogId') blogId: string,
     @Body() postInputModel: blogPostInputModelPipe,
   ): Promise<postViewType | string> {
-    const blog = await this.blogsQweryRepository.getBlogByBlogId(blogId);
-    if (!blog) throw new NotFoundException('Blog with this id does not exist');
-    const newPostId = await this.postsService.createPost(
-      postInputModel.title,
-      postInputModel.shortDescription,
-      postInputModel.content,
+    const newPostId = await this.postsService.createPost({
+      ...postInputModel,
       blogId,
-      blog.name,
-    );
+    });
     const newPost = await this.postsQweryRepository.getPostByPostId(newPostId);
     return newPost!;
   }

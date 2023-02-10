@@ -15,7 +15,7 @@ import { UsersQweryRepository } from '../repositoriesQwery/usersQwery.repository
 import { UsersRepository } from '../../repositories/users.repository';
 import { userQueryType } from '../../types/usersTypes/userQweryType';
 import { UsersViewType } from '../../types/usersTypes/usersViewType';
-import { userInputModelPipe } from './pipes/userInputDtoPipe';
+import { userInputModelPipe } from '../pipes/users/userInputDtoPipe';
 import { BasicAuthGuard } from '../guards/auth-guard';
 
 @Controller('users')
@@ -29,6 +29,7 @@ export class UsersController {
   @UseGuards(BasicAuthGuard)
   async getAllUsers(
     @Query() query: userQueryType,
+    //todo qwery pipe
   ): Promise<UsersViewType | string> {
     const users = await this.usersQweryRepository.getAllUsers(query);
     return users;

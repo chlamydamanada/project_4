@@ -12,6 +12,7 @@ import { CommentsQweryRepository } from '../repositoriesQwery/commentsQwery.repo
 import { CommentViewType } from '../../types/commentsTypes/commentViewType';
 import { commentInputDtoType } from '../../types/commentsTypes/commentInputDtoPipe';
 import { CommentService } from '../../application/comments.service';
+import { commentInputDtoPipe } from '../pipes/comments/commentInputDtoPipe';
 
 @Controller('comments')
 export class CommentsContoller {
@@ -34,7 +35,8 @@ export class CommentsContoller {
   @HttpCode(204)
   async updateCommentByCommentId(
     @Param('id') commentId: string,
-    @Body() commentInputDto: commentInputDtoType,
+    @Body() commentInputDto: commentInputDtoPipe,
+    //todo pipe for inputModel
   ): Promise<void> {
     await this.commentService.updateCommentById(commentId, commentInputDto);
     return;

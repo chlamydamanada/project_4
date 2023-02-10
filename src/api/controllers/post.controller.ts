@@ -21,8 +21,11 @@ import { CommentsViewType } from '../../types/commentsTypes/commentsViewType';
 import { postInputModelWithBlogIdType } from '../../types/postsTypes/postInputModelWithBlogIdType';
 import { BlogsQweryRepository } from '../repositoriesQwery/blogsQwery.repository';
 import { Response } from 'express';
-import { postInputModelIdPipe } from './pipes/postInputDtoPipe';
+import { postInputModelIdPipe } from '../pipes/posts/postInputDtoPipe';
 import { BasicAuthGuard } from '../guards/auth-guard';
+import { PostQweryPipe } from '../pipes/posts/postQweryPipe';
+import { CommentQweryPipe } from '../pipes/comments/commentQweryPipe';
+import { commentQueryType } from '../../types/commentsTypes/commentQweryType';
 
 @Controller('posts')
 export class PostsController {
@@ -33,8 +36,10 @@ export class PostsController {
     private readonly commentsQweryRepository: CommentsQweryRepository,
   ) {}
   @Get()
-  async getAllPosts(@Query() query: postQueryType) {
-    const posts = await this.postsQweryRepository.getAllPosts(query);
+  async getAllPosts(@Query() query: PostQweryPipe) {
+    const posts = await this.postsQweryRepository.getAllPosts(
+      query as postQueryType,
+    );
     return posts;
   }
 
@@ -50,13 +55,13 @@ export class PostsController {
   @Get(':postId/comments')
   async getAllCommentsByPostId(
     @Param('postId') postId: string,
-    @Query() query: postQueryType,
+    @Query() query: CommentQweryPipe,
   ): Promise<CommentsViewType | string> {
     const post = await this.postsQweryRepository.getPostByPostId(postId);
     if (!post) throw new NotFoundException('Post with this id does not exist');
     const allComments = await this.commentsQweryRepository.getAllComments(
       postId,
-      query,
+      query as commentQueryType,
     );
     return allComments;
   }
@@ -66,17 +71,7 @@ export class PostsController {
   async createPost(
     @Body() postInputModel: postInputModelIdPipe,
   ): Promise<postViewType | string | number> {
-    const blog = await this.blogsQweryRepository.getBlogByBlogId(
-      postInputModel.blogId,
-    );
-    if (!blog) throw new NotFoundException('Blog with this id does not exist');
-    const newPostId = await this.postsService.createPost(
-      postInputModel.title,
-      postInputModel.shortDescription,
-      postInputModel.content,
-      postInputModel.blogId,
-      blog.name,
-    );
+    const newPostId = await this.postsService.createPost(postInputModel);
     const newPost = await this.postsQweryRepository.getPostByPostId(newPostId);
     return newPost!;
   }
@@ -87,22 +82,8 @@ export class PostsController {
   async updatePost(
     @Param('id') postId: string,
     @Body() postInputDto: postInputModelIdPipe,
-  ): Promise<string | void> {
-    const blog = await this.blogsQweryRepository.getBlogByBlogId(
-      postInputDto.blogId,
-    );
-    if (!blog) throw new NotFoundException('Blog with this id does not exist');
-
-    const isPost = await this.postsService.updatePost(
-      postId,
-      postInputDto.title,
-      postInputDto.shortDescription,
-      postInputDto.content,
-      postInputDto.blogId,
-      blog.name,
-    );
-    if (!isPost)
-      throw new NotFoundException('Post with this id does not exist');
+  ): Promise<void> {
+    await this.postsService.updatePost(postInputDto, postId);
     return;
   }
 

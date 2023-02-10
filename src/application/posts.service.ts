@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BlogsRepository } from '../repositories/blogs.repository';
 import { Post, PostEntity } from '../domain/post.schema';
 import { PostsRepository } from '../repositories/posts.repository';
+import { creatingPostDtoType } from '../types/postsTypes/creatingDtoType';
+import { updatingPostDtoType } from '../types/postsTypes/updatingPostDtoType';
 
 @Injectable()
 export class PostsService {
@@ -12,42 +14,28 @@ export class PostsService {
     private readonly blogsRepository: BlogsRepository,
     private readonly postsRepository: PostsRepository,
   ) {}
-  async createPost(
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string,
-    blogName: string,
-  ): Promise<string> {
-    const newPost = new this.postModel({
-      title,
-      shortDescription,
-      content,
-      blogId,
-      blogName,
-      createdAt: new Date().toISOString(),
-    });
+  async createPost(postDto: creatingPostDtoType): Promise<string> {
+    const blog = await this.blogsRepository.findBlogById(postDto.blogId);
+    if (!blog) throw new NotFoundException('Blog with this id does not exist');
+    const newPost = new this.postModel();
+    newPost.createPost(postDto, blog.name);
     const newPostId = await this.postsRepository.savePost(newPost);
     return newPostId;
   }
 
   async updatePost(
+    postDto: updatingPostDtoType,
     postId: string,
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string,
-    blogName: string,
-  ): Promise<boolean> {
-    // find blog by id
+  ): Promise<void> {
+    const blog = await this.blogsRepository.findBlogById(postDto.blogId);
+    if (!blog) throw new NotFoundException('Blog with this id does not exist');
     const post = await this.postsRepository.findPostById(postId);
-    // if(!blog) return false;
-    if (!post) return false;
-    post.title = title;
-    post.shortDescription = shortDescription;
-    post.content = content;
+    if (!post) throw new NotFoundException('Post with this id does not exist');
+    if (blog.id !== post.blogId)
+      throw new NotFoundException('This post does not belong to this blog');
+    post.updatePost(postDto);
     await this.postsRepository.savePost(post);
-    return true;
+    return;
   }
   async deletePostByPostId(postId: string): Promise<void> {
     await this.postsRepository.deletePost(postId);

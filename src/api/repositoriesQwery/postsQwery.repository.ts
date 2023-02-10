@@ -14,18 +14,17 @@ export class PostsQweryRepository {
   constructor(@InjectModel(Post.name) private postModel: Model<PostEntity>) {}
 
   async getAllPosts(query: postQueryType): Promise<postsViewType> {
-    const queryFilter = sortingQueryFields(query);
     const totalCount = await this.postModel.count({});
     const posts = await this.postModel
       .find({})
-      .sort({ [queryFilter.sortBy]: queryFilter.sortDirection })
-      .skip((queryFilter.pageNumber - 1) * queryFilter.pageSize)
-      .limit(queryFilter.pageSize);
+      .sort({ [query.sortBy]: query.sortDirection })
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .limit(query.pageSize);
     const result = makeViewPosts(
       posts,
       totalCount,
-      queryFilter.pageSize,
-      queryFilter.pageNumber,
+      query.pageSize,
+      query.pageNumber,
     );
     return result;
   }
@@ -34,18 +33,17 @@ export class PostsQweryRepository {
     blogId: string,
     query: postQueryType,
   ): Promise<postsViewType> {
-    const queryFilter = sortingQueryFields(query);
     const totalCount = await this.postModel.count({ blogId: blogId });
     const posts = await this.postModel
       .find({ blogId: blogId })
-      .sort({ [queryFilter.sortBy]: queryFilter.sortDirection })
-      .skip((queryFilter.pageNumber - 1) * queryFilter.pageSize)
-      .limit(queryFilter.pageSize);
+      .sort({ [query.sortBy]: query.sortDirection })
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .limit(query.pageSize);
     const result = makeViewPosts(
       posts,
       totalCount,
-      queryFilter.pageSize,
-      queryFilter.pageNumber,
+      query.pageSize,
+      query.pageNumber,
     );
     return result;
   }

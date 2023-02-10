@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { loginInputModelPipe } from './pipes/loginInputDtoPipe';
+import { loginInputModelPipe } from '../pipes/auth/loginInputDtoPipe';
 import { AuthService } from '../../application/auth.service';
 
 @Controller('auth')

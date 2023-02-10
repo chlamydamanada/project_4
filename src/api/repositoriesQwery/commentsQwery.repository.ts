@@ -17,18 +17,17 @@ export class CommentsQweryRepository {
     postId: string,
     query: commentQueryType,
   ): Promise<CommentsViewType> {
-    const queryFilter = sortingQueryFields(query);
     const totalCount = await this.commentModel.count({ postId: postId });
     const comments = await this.commentModel
       .find({ postId: postId })
-      .sort({ [queryFilter.sortBy]: queryFilter.sortDirection })
-      .skip((queryFilter.pageNumber - 1) * queryFilter.pageSize)
-      .limit(queryFilter.pageSize);
+      .sort({ [query.sortBy]: query.sortDirection })
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .limit(query.pageSize);
     const result = makeViewComments(
       comments,
       totalCount,
-      queryFilter.pageSize,
-      queryFilter.pageNumber,
+      query.pageSize,
+      query.pageNumber,
     );
     return result;
   }

@@ -2,7 +2,7 @@ import { IsNotEmpty, IsUrl, Length } from 'class-validator';
 
 export class blogInputModelPipe {
   @IsNotEmpty()
-  @Length(3, 15)
+  @Length(0, 15)
   name: string;
 
   @IsNotEmpty()
