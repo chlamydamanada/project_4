@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../app.module';
-import * as request from 'supertest';
+import request from 'supertest';
 import { blogsData } from './blogsData';
 
 describe('AppController', () => {
@@ -29,6 +29,7 @@ describe('AppController', () => {
         it('should create correct blog and return it: STATUS 201', async () => {
           const newBlog = await request(server)
             .post('/blogs')
+            .set('Authorization', `Basic YWRtaW46cXdlcnR5`)
             .send(blogsData.validBlog_1)
             .expect(201);
 
@@ -38,6 +39,7 @@ describe('AppController', () => {
             id: expect.any(String),
             ...blogsData.validBlog_1,
             createdAt: expect.any(String),
+            isMembership: true,
           });
         });
         it('should return new blog by blogId: STATUS 200', async () => {
@@ -49,6 +51,7 @@ describe('AppController', () => {
             id: blogId,
             ...blogsData.validBlog_1,
             createdAt: expect.any(String),
+            isMembership: true,
           });
         });
       });

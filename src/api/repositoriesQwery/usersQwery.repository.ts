@@ -9,12 +9,12 @@ import { makeViewUser } from '../../helpers/makerViewUser';
 import { sortingQueryFields } from '../../helpers/qweryFilter';
 import { makeLoginOrEmailFilter } from '../../helpers/loginOrEmailFilter';
 import { makeViewUsers } from '../../helpers/makerViewUsers';
+import { MeViweType } from '../../auth/types/meViweType';
 
 @Injectable()
 export class UsersQweryRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserEntity>) {}
   async getAllUsers(query: userQueryType): Promise<UsersViewType> {
-    const queryFilter = sortingQueryFields(query);
     const loginOrEmailFilter = makeLoginOrEmailFilter(
       query.searchLoginTerm,
       query.searchEmailTerm,
@@ -22,14 +22,14 @@ export class UsersQweryRepository {
     const totalCount = await this.userModel.count(loginOrEmailFilter);
     const users = await this.userModel
       .find(loginOrEmailFilter)
-      .sort({ [queryFilter.sortBy]: queryFilter.sortDirection })
-      .skip((queryFilter.pageNumber - 1) * queryFilter.pageSize)
-      .limit(queryFilter.pageSize);
+      .sort({ [query.sortBy]: query.sortDirection as 1 | -1 })
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .limit(query.pageSize);
     const result = makeViewUsers(
       users,
       totalCount,
-      queryFilter.pageSize,
-      queryFilter.pageNumber,
+      query.pageSize,
+      query.pageNumber,
     );
     return result;
   }
@@ -39,5 +39,16 @@ export class UsersQweryRepository {
     });
     if (!user) return undefined;
     return makeViewUser(user);
+  }
+  async getMyProfile(userId: string): Promise<MeViweType | undefined> {
+    const user = await this.userModel.findOne({
+      _id: new Types.ObjectId(userId),
+    });
+    if (!user) return undefined;
+    return {
+      email: user.email,
+      login: user.login,
+      userId: userId,
+    };
   }
 }

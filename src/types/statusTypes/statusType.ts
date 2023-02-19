@@ -1,5 +1,5 @@
-export declare enum reactionStatusType {
-  'Like' = 'Like',
-  'Dislike' = 'Dislike',
-  'None' = 'None',
+export enum reactionStatusType {
+  Like = 'Like',
+  Dislike = 'Dislike',
+  None = 'None',
 }

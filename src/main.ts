@@ -2,10 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from '../exception.filter';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
+  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       stopAtFirstError: true,
@@ -16,7 +18,7 @@ async function bootstrap() {
           message: Object.values(e.constraints!)[0],
           field: e.property,
         }));
-        throw new BadRequestException({ errorsMessages: result });
+        throw new BadRequestException(result);
       },
     }),
   );

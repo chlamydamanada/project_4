@@ -7,7 +7,7 @@ import { Model, Types } from 'mongoose';
 export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserEntity>) {}
 
-  async saveUser(user: UserEntity) {
+  async saveUser(user: UserEntity): Promise<string> {
     const newUser = await user.save();
     return newUser._id.toString();
   }
@@ -36,6 +36,25 @@ export class UsersRepository {
   ): Promise<undefined | UserEntity> {
     const user = await this.userModel.findOne({
       $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+    });
+    if (!user) return undefined;
+    return user;
+  }
+  async findUserByConfirmationCode(
+    code: string,
+  ): Promise<undefined | UserEntity> {
+    const user = await this.userModel.findOne({
+      'emailConfirmation.confirmationCode': code,
+    });
+    if (!user) return undefined;
+    return user;
+  }
+
+  async findUserByPasswordRecoveryCode(
+    code: string,
+  ): Promise<undefined | UserEntity> {
+    const user = await this.userModel.findOne({
+      'passwordRecoveryInfo.recoveryCode': code,
     });
     if (!user) return undefined;
     return user;

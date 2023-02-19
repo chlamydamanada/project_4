@@ -22,23 +22,34 @@ import { postInputModelWithBlogIdType } from '../../types/postsTypes/postInputMo
 import { BlogsQweryRepository } from '../repositoriesQwery/blogsQwery.repository';
 import { Response } from 'express';
 import { postInputModelIdPipe } from '../pipes/posts/postInputDtoPipe';
-import { BasicAuthGuard } from '../guards/auth-guard';
+import { BasicAuthGuard } from '../../auth/guards/auth-guard';
 import { PostQweryPipe } from '../pipes/posts/postQweryPipe';
 import { CommentQweryPipe } from '../pipes/comments/commentQweryPipe';
 import { commentQueryType } from '../../types/commentsTypes/commentQweryType';
+import { AccessTokenGuard } from '../../auth/guards/accessTokenAuth.guard';
+import { commentInputDtoPipe } from '../pipes/comments/commentInputDtoPipe';
+import { CurrentUserId } from '../../auth/decorators/currentUserId.decorator';
+import { CommentService } from '../../application/comments.service';
+import { CommentViewType } from '../../types/commentsTypes/commentViewType';
+import { StatusPipe } from '../pipes/status/statusPipe';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
+    private readonly commentService: CommentService,
     private readonly blogsQweryRepository: BlogsQweryRepository,
     private readonly postsQweryRepository: PostsQweryRepository,
     private readonly commentsQweryRepository: CommentsQweryRepository,
   ) {}
   @Get()
-  async getAllPosts(@Query() query: PostQweryPipe) {
+  async getAllPosts(
+    @Query() query: PostQweryPipe,
+    @CurrentUserId() userId: string | null,
+  ) {
     const posts = await this.postsQweryRepository.getAllPosts(
       query as postQueryType,
+      userId,
     );
     return posts;
   }
@@ -46,8 +57,12 @@ export class PostsController {
   @Get(':id')
   async getPostByPostId(
     @Param('id') postId: string,
+    @CurrentUserId() userId: string | null,
   ): Promise<postViewType | string | number> {
-    const post = await this.postsQweryRepository.getPostByPostId(postId);
+    const post = await this.postsQweryRepository.getPostByPostId(
+      postId,
+      userId,
+    );
     if (!post) throw new NotFoundException('Post with this id does not exist');
     return post;
   }
@@ -56,12 +71,14 @@ export class PostsController {
   async getAllCommentsByPostId(
     @Param('postId') postId: string,
     @Query() query: CommentQweryPipe,
+    @CurrentUserId() userId: string | null,
   ): Promise<CommentsViewType | string> {
     const post = await this.postsQweryRepository.getPostByPostId(postId);
     if (!post) throw new NotFoundException('Post with this id does not exist');
     const allComments = await this.commentsQweryRepository.getAllComments(
       postId,
       query as commentQueryType,
+      userId,
     );
     return allComments;
   }
@@ -76,6 +93,24 @@ export class PostsController {
     return newPost!;
   }
 
+  @Post(':postId/comments')
+  @UseGuards(AccessTokenGuard)
+  async createCommentByPostId(
+    @Param('postId') postId: string,
+    @Body() commentInputDto: commentInputDtoPipe,
+    @CurrentUserId() userId: string,
+  ): Promise<CommentViewType> {
+    const commentId = await this.commentService.createCommentByPostId(
+      postId,
+      commentInputDto,
+      userId,
+    );
+    const comment = await this.commentsQweryRepository.getCommentByCommentId(
+      commentId,
+    );
+    return comment!;
+  }
+
   @Put(':id')
   @UseGuards(BasicAuthGuard)
   @HttpCode(204)
@@ -84,6 +119,18 @@ export class PostsController {
     @Body() postInputDto: postInputModelIdPipe,
   ): Promise<void> {
     await this.postsService.updatePost(postInputDto, postId);
+    return;
+  }
+
+  @Put(':id/like-status')
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(204)
+  async updatePostStatusById(
+    @Param('id') postId: string,
+    @CurrentUserId() userId: string,
+    @Body() statusDto: StatusPipe,
+  ): Promise<void> {
+    await this.postsService.generatePostStatusById(postId, userId, statusDto);
     return;
   }
 

@@ -1,5 +1,6 @@
 import { IsNumber, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { sortingDirection } from '../../../helpers/sortingDerection';
 
 export class BlogQweryPipe {
   @IsOptional()
@@ -20,7 +21,3 @@ export class BlogQweryPipe {
   @Transform(({ value }) => sortingDirection(value))
   sortDirection = -1;
 }
-
-const sortingDirection = (value: string): 1 | -1 => {
-  return value ? (value === 'asc' ? 1 : -1) : -1;
-};

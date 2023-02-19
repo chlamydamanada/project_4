@@ -1,13 +1,22 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostEntity } from '../domain/post.schema';
 import { Model, Types } from 'mongoose';
+import { Status, StatusEntity } from '../domain/status.schema';
 
 export class PostsRepository {
-  constructor(@InjectModel(Post.name) private postModel: Model<PostEntity>) {}
+  constructor(
+    @InjectModel(Post.name) private postModel: Model<PostEntity>,
+    @InjectModel(Status.name) private statusModel: Model<StatusEntity>,
+  ) {}
 
   async savePost(post: PostEntity): Promise<string> {
     const newPost = await post.save();
     return newPost._id.toString();
+  }
+
+  async saveStatus(status: StatusEntity) {
+    await status.save();
+    return;
   }
 
   async findPostById(postId: string) {
@@ -15,6 +24,20 @@ export class PostsRepository {
       _id: new Types.ObjectId(postId),
     });
     return post;
+  }
+
+  async findStatusOfPost(
+    entity: string,
+    postId: string,
+    userId: string,
+  ): Promise<undefined | StatusEntity> {
+    const status = await this.statusModel.findOne({
+      entityId: postId,
+      entity: entity,
+      userId: userId,
+    });
+    if (!status) return undefined;
+    return status;
   }
 
   async deletePost(postId: string): Promise<void> {

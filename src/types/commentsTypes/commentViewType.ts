@@ -1,5 +1,3 @@
-import { reactionStatusType } from '../statusTypes/statusType';
-
 export type CommentViewType = {
   id: string;
   content: string;
