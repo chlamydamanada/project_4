@@ -1,13 +1,15 @@
 import { IsNumber, IsOptional } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CommentQweryPipe {
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   pageNumber = 1;
 
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   pageSize = 10;
 
   @IsOptional()
