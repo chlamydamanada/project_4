@@ -1,11 +1,15 @@
 import { IsNumber, IsOptional } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { sortingDirection } from '../../../helpers/sortingDerection';
 
 export class UserQweryPipe {
+  @IsNumber()
+  @Type(() => Number)
   @IsOptional()
   pageNumber = 1;
 
+  @IsNumber()
+  @Type(() => Number)
   @IsOptional()
   pageSize = 10;
 
