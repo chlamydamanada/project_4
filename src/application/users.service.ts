@@ -32,8 +32,9 @@ export class UsersService {
     const isExistByEmail = await this.usersRepository.findUserByLoginOrEmail(
       userInputModel.email,
     );
+    console.log('isExistByEmail:', isExistByEmail);
     if (isExistByEmail)
-      throw new NotFoundException([
+      throw new BadRequestException([
         {
           message: 'Email already exist',
           field: 'email',

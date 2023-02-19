@@ -16,6 +16,7 @@ export class UsersRepository {
     const user = await this.userModel.findOne({
       _id: new Types.ObjectId(userId),
     });
+    if (!user) return null;
     return user;
   }
 
@@ -37,6 +38,7 @@ export class UsersRepository {
     const user = await this.userModel.findOne({
       $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
     });
+
     if (!user) return undefined;
     return user;
   }

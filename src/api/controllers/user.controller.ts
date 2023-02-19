@@ -26,6 +26,7 @@ export class UsersController {
     private readonly usersQweryRepository: UsersQweryRepository,
   ) {}
   @Get()
+  @HttpCode(200)
   @UseGuards(BasicAuthGuard)
   async getAllUsers(
     @Query() query: UserQweryPipe,

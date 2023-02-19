@@ -51,12 +51,7 @@ import { ExtractATMiddleware } from './auth/extractAT.middleware';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    MongooseModule.forRootAsync({
-      useFactory: async (config: ConfigService) => ({
-        uri: config.get<string>('MONGO_URL'),
-      }),
-      inject: [ConfigService],
-    }),
+    MongooseModule.forRoot(process.env.MONGO_URL!),
     MongooseModule.forFeature([
       BlogModel,
       PostModel,

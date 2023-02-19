@@ -109,6 +109,7 @@ export class AuthService {
 
   async registerUser(userInputModel: UserInputModelType): Promise<void> {
     const newUserId = await this.usersService.createUser(userInputModel);
+    console.log('authService/registerUser:', newUserId);
     const newUser = await this.usersRepository.findUserById(newUserId);
     await this.mailService.sendRegistrationEmail(
       newUser!.emailConfirmation.confirmationCode,
