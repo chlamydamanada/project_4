@@ -42,5 +42,6 @@ export class Post {
 export const PostSchema = SchemaFactory.createForClass(Post);
 PostSchema.methods = {
   createPost: Post.prototype.createPost,
+  updatePost: Post.prototype.updatePost,
 };
 export const PostModel = { name: Post.name, schema: PostSchema };

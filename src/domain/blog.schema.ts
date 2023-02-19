@@ -25,7 +25,7 @@ export class Blog {
     this.description = blogDto.description;
     this.websiteUrl = blogDto.websiteUrl;
     this.createdAt = new Date().toISOString();
-    this.isMembership = true;
+    this.isMembership = false;
   }
   updateBlog(name, description, websiteUrl) {
     this.name = name;
