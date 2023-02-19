@@ -4,11 +4,9 @@ import { sortingDirection } from '../../../helpers/sortingDerection';
 
 export class UserQweryPipe {
   @IsOptional()
-  @IsNumber()
   pageNumber = 1;
 
   @IsOptional()
-  @IsNumber()
   pageSize = 10;
 
   @IsOptional()

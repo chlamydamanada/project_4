@@ -32,8 +32,9 @@ export class AuthController {
     private readonly usersQweryRepository: UsersQweryRepository,
   ) {}
 
-  @UseGuards(PasswordAuthGuard)
   @Post('login')
+  @UseGuards(PasswordAuthGuard)
+  @HttpCode(200)
   async login(
     @CurrentUserId() userId: string,
     @Ip() ip: string,
