@@ -75,6 +75,8 @@ export class BlogsController {
       query as postQueryType,
       userId,
     );
+    if (!posts)
+      throw new NotFoundException('Posts of blog with this id do not exist');
     return posts;
   }
 

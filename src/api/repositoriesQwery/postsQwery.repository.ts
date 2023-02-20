@@ -41,13 +41,14 @@ export class PostsQweryRepository {
     blogId: string,
     query: postQueryType,
     userId?: string | undefined | null,
-  ): Promise<postsViewType> {
+  ): Promise<postsViewType | null> {
     const totalCount = await this.postModel.count({ blogId: blogId });
     const posts = await this.postModel
       .find({ blogId: blogId })
       .sort({ [query.sortBy]: query.sortDirection })
       .skip((query.pageNumber - 1) * query.pageSize)
       .limit(query.pageSize);
+    if (!posts) return null;
     const result = await Promise.all(
       posts.map(async (p) => await this.makeViewPost(p, userId)),
     );
