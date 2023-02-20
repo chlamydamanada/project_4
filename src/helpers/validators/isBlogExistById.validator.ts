@@ -9,15 +9,15 @@ import { BlogsQweryRepository } from '../../api/repositoriesQwery/blogsQwery.rep
 @ValidatorConstraint({ name: 'IsBlogExist', async: true })
 @Injectable()
 export class IsBlogExistValidator implements ValidatorConstraintInterface {
-  constructor(
-    @Inject(BlogsQweryRepository)
-    private blogQueryRepository: BlogsQweryRepository,
-  ) {}
+  constructor(private readonly blogsQweryRepository: BlogsQweryRepository) {}
 
   async validate(id: string) {
     try {
-      const blog = await this.blogQueryRepository.getBlogByBlogId(id);
+      console.log('id:', id);
+      const blog = await this.blogsQweryRepository.getBlogByBlogId(id);
+      console.log('blog:', blog);
       if (!blog) return false;
+
       return true;
     } catch (e) {
       return false;

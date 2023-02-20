@@ -10,7 +10,6 @@ import { User, UserEntity } from '../domain/user.schema';
 import { Model } from 'mongoose';
 import { AccessTokenViewType } from './types/accessTokenViewType';
 import { v4 as uuidv4 } from 'uuid';
-import { authConstants } from './authConstants';
 import { CodeType } from './types/codeType';
 import { MailService } from '../email/email.service';
 import { EmailType } from './types/emailType';

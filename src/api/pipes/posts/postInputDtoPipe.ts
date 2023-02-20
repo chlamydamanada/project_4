@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { IsBlogExist } from '../../../helpers/decorators/some.decorator';
+import { IsBlogExist } from '../../../helpers/decorators/isBlogExist.decorator';
 
 export class blogPostInputModelPipe {
   @IsNotEmpty()
@@ -42,7 +42,6 @@ export class postInputModelIdPipe {
   content: string;
 
   @IsNotEmpty()
-  @Length(1, 1000)
   @IsBlogExist()
   @IsString()
   blogId: string;

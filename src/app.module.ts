@@ -38,6 +38,7 @@ import { DevicesQweryRepository } from './api/repositoriesQwery/deviceQwery.repo
 import { DevicesRepository } from './repositories/device.repository';
 import { RefreshTokenStrategy } from './auth/strategies/refreshToken.strategy';
 import { StatusModel } from './domain/status.schema';
+import { IsBlogExistValidator } from './helpers/validators/isBlogExistById.validator';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { StatusModel } from './domain/status.schema';
     PostsService,
     UsersService,
     CommentService,
+    IsBlogExistValidator,
     BlogsQweryRepository,
     BlogsRepository,
     PostsQweryRepository,
