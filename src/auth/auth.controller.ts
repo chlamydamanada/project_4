@@ -24,14 +24,15 @@ import { UserIdDeviceIdType } from './types/userIdDeviceIdType';
 import { NewPassRecoveryDtoPipe } from './pipes/newPassRecoveryDtoPipe';
 import { AccessTokenViewType } from './types/accessTokenViewType';
 import { MeViweType } from './types/meViweType';
-
+import { SkipThrottle } from '@nestjs/throttler';
+@SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersQweryRepository: UsersQweryRepository,
   ) {}
-
+  @SkipThrottle(false)
   @Post('login')
   @UseGuards(PasswordAuthGuard)
   @HttpCode(200)
@@ -64,6 +65,7 @@ export class AuthController {
     // todo validation user can be undefined!?
   }
 
+  @SkipThrottle(false)
   @Post('registration')
   @HttpCode(204)
   async registration(
@@ -73,6 +75,7 @@ export class AuthController {
     return;
   }
 
+  @SkipThrottle(false)
   @Post('registration-confirmation')
   @HttpCode(204)
   async registrationConfirmation(@Body() codeDto: CodePipe): Promise<void> {
@@ -80,6 +83,7 @@ export class AuthController {
     return;
   }
 
+  @SkipThrottle(false)
   @Post('registration-email-resending')
   @HttpCode(204)
   async registrationEmailResending(@Body() emailDto: EmailPipe): Promise<void> {
@@ -123,12 +127,14 @@ export class AuthController {
     return;
   }
 
+  @SkipThrottle(false)
   @Post('password-recovery')
   async passwordRecovery(@Body() emailInputDto: EmailPipe): Promise<void> {
     await this.authService.createRecoveryCode(emailInputDto);
     return;
   }
 
+  @SkipThrottle(false)
   @Post('new-password')
   @HttpCode(204)
   async newPassword(

@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, Length } from 'class-validator';
+import {
+  IsAlphanumeric,
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  Length,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { IsBlogExist } from '../../../helpers/decorators/isBlogExist.decorator';
 
@@ -41,8 +47,10 @@ export class postInputModelIdPipe {
   @IsString()
   content: string;
 
-  @IsNotEmpty()
   @IsBlogExist()
+  @IsNotEmpty()
+  @Transform(({ value }) => value?.trim())
+  @IsAlphanumeric() //Checks if the string contains only letters and numbers.
   @IsString()
   blogId: string;
 }
