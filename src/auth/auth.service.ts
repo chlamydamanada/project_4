@@ -48,7 +48,7 @@ export class AuthService {
     const token = await this.jwtService.signAsync(
       { userId: userId },
       {
-        expiresIn: 1000,
+        expiresIn: '10 seconds',
         secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
       },
     );
@@ -66,7 +66,7 @@ export class AuthService {
     const token = await this.jwtService.signAsync(
       { userId: userId, deviceId: deviceId },
       {
-        expiresIn: 50000,
+        expiresIn: '20 seconds',
         secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
       },
     );
@@ -91,7 +91,7 @@ export class AuthService {
     const token = this.jwtService.sign(
       { userId: userId, deviceId: deviceId },
       {
-        expiresIn: 50000,
+        expiresIn: '20 seconds',
         secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
       },
     );
