@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  NotFoundException,
   Param,
   Post,
   Query,
@@ -12,8 +11,6 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../../application/users.service';
 import { UsersQweryRepository } from '../repositoriesQwery/usersQwery.repository';
-import { UsersRepository } from '../../repositories/users.repository';
-import { userQueryType } from '../../types/usersTypes/userQweryType';
 import { UsersViewType } from '../../types/usersTypes/usersViewType';
 import { userInputModelPipe } from '../pipes/users/userInputDtoPipe';
 import { BasicAuthGuard } from '../../auth/guards/auth-guard';

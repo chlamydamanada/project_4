@@ -9,7 +9,6 @@ import {
   Post,
   Put,
   Query,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from '../../application/posts.service';
@@ -18,9 +17,7 @@ import { postQueryType } from '../../types/postsTypes/postsQweryType';
 import { postViewType } from '../../types/postsTypes/postViewType';
 import { CommentsQweryRepository } from '../repositoriesQwery/commentsQwery.repository';
 import { CommentsViewType } from '../../types/commentsTypes/commentsViewType';
-import { postInputModelWithBlogIdType } from '../../types/postsTypes/postInputModelWithBlogIdType';
 import { BlogsQweryRepository } from '../repositoriesQwery/blogsQwery.repository';
-import { Response } from 'express';
 import { postInputModelIdPipe } from '../pipes/posts/postInputDtoPipe';
 import { BasicAuthGuard } from '../../auth/guards/auth-guard';
 import { PostQweryPipe } from '../pipes/posts/postQweryPipe';

@@ -1,6 +1,5 @@
 import {
   Body,
-  CanActivate,
   Controller,
   Delete,
   Get,
@@ -10,7 +9,6 @@ import {
   Post,
   Put,
   Query,
-  SetMetadata,
   UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from '../../application/blogs.service';

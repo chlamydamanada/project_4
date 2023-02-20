@@ -6,7 +6,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User, UserEntity } from '../../domain/user.schema';
 import { makeViewUser } from '../../helpers/helperFunctions/makerViewUser';
-import { sortingQueryFields } from '../../helpers/helperFunctions/qweryFilter';
 import { makeLoginOrEmailFilter } from '../../helpers/helperFunctions/loginOrEmailFilter';
 import { makeViewUsers } from '../../helpers/helperFunctions/makerViewUsers';
 import { MeViweType } from '../../auth/types/meViweType';

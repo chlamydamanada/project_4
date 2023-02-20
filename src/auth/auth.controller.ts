@@ -24,17 +24,17 @@ import { UserIdDeviceIdType } from './types/userIdDeviceIdType';
 import { NewPassRecoveryDtoPipe } from './pipes/newPassRecoveryDtoPipe';
 import { AccessTokenViewType } from './types/accessTokenViewType';
 import { MeViweType } from './types/meViweType';
-import { SkipThrottle } from '@nestjs/throttler';
-@SkipThrottle()
+import { ThrottlerGuard } from '@nestjs/throttler';
+
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersQweryRepository: UsersQweryRepository,
   ) {}
-  @SkipThrottle(false)
+
   @Post('login')
-  @UseGuards(PasswordAuthGuard)
+  @UseGuards(ThrottlerGuard, PasswordAuthGuard)
   @HttpCode(200)
   async login(
     @CurrentUserId() userId: string,
@@ -65,8 +65,8 @@ export class AuthController {
     // todo validation user can be undefined!?
   }
 
-  @SkipThrottle(false)
   @Post('registration')
+  @UseGuards(ThrottlerGuard)
   @HttpCode(204)
   async registration(
     @Body() userInputModel: userInputModelPipe,
@@ -75,16 +75,16 @@ export class AuthController {
     return;
   }
 
-  @SkipThrottle(false)
   @Post('registration-confirmation')
+  @UseGuards(ThrottlerGuard)
   @HttpCode(204)
   async registrationConfirmation(@Body() codeDto: CodePipe): Promise<void> {
     await this.authService.confirmEmail(codeDto);
     return;
   }
 
-  @SkipThrottle(false)
   @Post('registration-email-resending')
+  @UseGuards(ThrottlerGuard)
   @HttpCode(204)
   async registrationEmailResending(@Body() emailDto: EmailPipe): Promise<void> {
     await this.authService.checkEmailIsConfirmed(emailDto);
@@ -127,15 +127,15 @@ export class AuthController {
     return;
   }
 
-  @SkipThrottle(false)
   @Post('password-recovery')
+  @UseGuards(ThrottlerGuard)
   async passwordRecovery(@Body() emailInputDto: EmailPipe): Promise<void> {
     await this.authService.createRecoveryCode(emailInputDto);
     return;
   }
 
-  @SkipThrottle(false)
   @Post('new-password')
+  @UseGuards(ThrottlerGuard)
   @HttpCode(204)
   async newPassword(
     @Body() newPassRecoveryDto: NewPassRecoveryDtoPipe,
