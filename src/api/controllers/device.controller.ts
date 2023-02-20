@@ -10,7 +10,7 @@ import {
 import { DevicesService } from '../../application/device.service';
 import { DevicesQweryRepository } from '../repositoriesQwery/deviceQwery.repository';
 import { RefreshTokenGuard } from '../../auth/guards/refreshTokenAuth.guard';
-import { CurrentUserIdDeviceId } from '../../auth/decorators/currentUserIdDeviceId';
+import { CurrentUserIdDeviceId } from '../../helpers/decorators/currentUserIdDeviceId';
 import { UserIdDeviceIdType } from '../../auth/types/userIdDeviceIdType';
 import { DeviceViewType } from '../../types/devices/deviceViewType';
 

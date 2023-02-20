@@ -28,7 +28,7 @@ import { blogPostInputModelPipe } from '../pipes/posts/postInputDtoPipe';
 import { BasicAuthGuard } from '../../auth/guards/auth-guard';
 import { BlogQweryPipe } from '../pipes/blogs/blogQweryPipe';
 import { PostQweryPipe } from '../pipes/posts/postQweryPipe';
-import { CurrentUserId } from '../../auth/decorators/currentUserId.decorator';
+import { CurrentUserId } from '../../helpers/decorators/currentUserId.decorator';
 import { ExtractUserIdFromAT } from '../../auth/guards/extractUserIdFromAT.guard';
 
 @Controller('blogs')

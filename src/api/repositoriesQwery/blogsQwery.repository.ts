@@ -4,9 +4,9 @@ import { blogsViewType } from '../../types/blogsTypes/blogsViewType';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogEntity } from '../../domain/blog.schema';
 import { Model, Types } from 'mongoose';
-import { makeNameFilter } from '../../helpers/nameFilter';
-import { makeViewBlogs } from '../../helpers/makerViewBlogs';
-import { makeViewBlog } from '../../helpers/makerViewBlog';
+import { makeNameFilter } from '../../helpers/helperFunctions/nameFilter';
+import { makeViewBlogs } from '../../helpers/helperFunctions/makerViewBlogs';
+import { makeViewBlog } from '../../helpers/helperFunctions/makerViewBlog';
 import { blogQueryType } from '../../types/blogsTypes/blogsQweryType';
 
 @Injectable()

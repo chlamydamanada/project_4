@@ -1,4 +1,4 @@
-import { UserEntity } from '../domain/user.schema';
+import { UserEntity } from '../../domain/user.schema';
 
 export const makeViewUser = (user: UserEntity) => {
   return {

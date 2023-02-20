@@ -28,7 +28,7 @@ import { CommentQweryPipe } from '../pipes/comments/commentQweryPipe';
 import { commentQueryType } from '../../types/commentsTypes/commentQweryType';
 import { AccessTokenGuard } from '../../auth/guards/accessTokenAuth.guard';
 import { commentInputDtoPipe } from '../pipes/comments/commentInputDtoPipe';
-import { CurrentUserId } from '../../auth/decorators/currentUserId.decorator';
+import { CurrentUserId } from '../../helpers/decorators/currentUserId.decorator';
 import { CommentService } from '../../application/comments.service';
 import { CommentViewType } from '../../types/commentsTypes/commentViewType';
 import { StatusPipe } from '../pipes/status/statusPipe';

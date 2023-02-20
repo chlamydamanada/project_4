@@ -1,6 +1,6 @@
 import { IsNumber, IsOptional } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { sortingDirection } from '../../../helpers/sortingDerection';
+import { sortingDirection } from '../../../helpers/helperFunctions/sortingDerection';
 
 export class UserQweryPipe {
   @IsNumber()

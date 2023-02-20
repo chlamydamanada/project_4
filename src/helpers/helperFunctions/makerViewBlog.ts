@@ -1,4 +1,4 @@
-import { BlogEntity } from '../domain/blog.schema';
+import { BlogEntity } from '../../domain/blog.schema';
 
 export const makeViewBlog = (blog: BlogEntity) => {
   return {

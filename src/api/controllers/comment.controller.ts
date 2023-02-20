@@ -14,7 +14,7 @@ import { CommentViewType } from '../../types/commentsTypes/commentViewType';
 import { CommentService } from '../../application/comments.service';
 import { commentInputDtoPipe } from '../pipes/comments/commentInputDtoPipe';
 import { AccessTokenGuard } from '../../auth/guards/accessTokenAuth.guard';
-import { CurrentUserId } from '../../auth/decorators/currentUserId.decorator';
+import { CurrentUserId } from '../../helpers/decorators/currentUserId.decorator';
 import { StatusPipe } from '../pipes/status/statusPipe';
 import { ExtractUserIdFromAT } from '../../auth/guards/extractUserIdFromAT.guard';
 

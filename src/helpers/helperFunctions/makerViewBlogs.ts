@@ -1,4 +1,4 @@
-import { BlogEntity } from '../domain/blog.schema';
+import { BlogEntity } from '../../domain/blog.schema';
 import { makeViewBlog } from './makerViewBlog';
 
 export const makeViewBlogs = (

@@ -71,7 +71,6 @@ import { StatusModel } from './domain/status.schema';
   providers: [
     AppService,
     AuthService,
-
     PasswordStrategy,
     AccessTokenStrategy,
     RefreshTokenStrategy,
@@ -93,7 +92,8 @@ import { StatusModel } from './domain/status.schema';
   ],
   exports: [UsersRepository],
 })
-export class AppModule {} /*implements NestModule {
+export class AppModule {}
+/*implements NestModule {
   async configure(consumer: MiddlewareConsumer) {
     await consumer
       .apply(ExtractATMiddleware)
