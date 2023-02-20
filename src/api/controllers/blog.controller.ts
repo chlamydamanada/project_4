@@ -29,6 +29,7 @@ import { BasicAuthGuard } from '../../auth/guards/auth-guard';
 import { BlogQweryPipe } from '../pipes/blogs/blogQweryPipe';
 import { PostQweryPipe } from '../pipes/posts/postQweryPipe';
 import { CurrentUserId } from '../../auth/decorators/currentUserId.decorator';
+import { ExtractUserIdFromAT } from '../../auth/guards/extractUserIdFromAT.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -43,7 +44,6 @@ export class BlogsController {
   async getAllBlogs(
     @Query() query: BlogQweryPipe,
   ): Promise<blogsViewType | string> {
-    console.log('+++++', query);
     const blogs = await this.blogsQweryRepository.getAllBlogs(
       query as blogQueryType,
     );
@@ -62,6 +62,7 @@ export class BlogsController {
   }
 
   @Get(':blogId/posts')
+  @UseGuards(ExtractUserIdFromAT)
   async getAllPostsByBlogId(
     @Param('blogId') blogId: string,
     @Query() query: PostQweryPipe,

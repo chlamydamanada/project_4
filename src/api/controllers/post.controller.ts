@@ -32,6 +32,7 @@ import { CurrentUserId } from '../../auth/decorators/currentUserId.decorator';
 import { CommentService } from '../../application/comments.service';
 import { CommentViewType } from '../../types/commentsTypes/commentViewType';
 import { StatusPipe } from '../pipes/status/statusPipe';
+import { ExtractUserIdFromAT } from '../../auth/guards/extractUserIdFromAT.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -42,7 +43,9 @@ export class PostsController {
     private readonly postsQweryRepository: PostsQweryRepository,
     private readonly commentsQweryRepository: CommentsQweryRepository,
   ) {}
+
   @Get()
+  @UseGuards(ExtractUserIdFromAT)
   async getAllPosts(
     @Query() query: PostQweryPipe,
     @CurrentUserId() userId: string | null,
@@ -55,6 +58,7 @@ export class PostsController {
   }
 
   @Get(':id')
+  @UseGuards(ExtractUserIdFromAT)
   async getPostByPostId(
     @Param('id') postId: string,
     @CurrentUserId() userId: string | null,
@@ -68,6 +72,7 @@ export class PostsController {
   }
 
   @Get(':postId/comments')
+  @UseGuards(ExtractUserIdFromAT)
   async getAllCommentsByPostId(
     @Param('postId') postId: string,
     @Query() query: CommentQweryPipe,

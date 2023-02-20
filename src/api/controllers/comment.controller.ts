@@ -16,6 +16,7 @@ import { commentInputDtoPipe } from '../pipes/comments/commentInputDtoPipe';
 import { AccessTokenGuard } from '../../auth/guards/accessTokenAuth.guard';
 import { CurrentUserId } from '../../auth/decorators/currentUserId.decorator';
 import { StatusPipe } from '../pipes/status/statusPipe';
+import { ExtractUserIdFromAT } from '../../auth/guards/extractUserIdFromAT.guard';
 
 @Controller('comments')
 export class CommentsController {
@@ -25,6 +26,7 @@ export class CommentsController {
   ) {}
 
   @Get(':id')
+  @UseGuards(ExtractUserIdFromAT)
   async getCommentByCommentId(
     @Param('id') commentId: string,
     @CurrentUserId() userId: string | null,

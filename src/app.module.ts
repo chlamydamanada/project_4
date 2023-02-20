@@ -1,10 +1,5 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -43,7 +38,6 @@ import { DevicesQweryRepository } from './api/repositoriesQwery/deviceQwery.repo
 import { DevicesRepository } from './repositories/device.repository';
 import { RefreshTokenStrategy } from './auth/strategies/refreshToken.strategy';
 import { StatusModel } from './domain/status.schema';
-import { ExtractATMiddleware } from './auth/extractAT.middleware';
 
 @Module({
   imports: [
@@ -99,7 +93,7 @@ import { ExtractATMiddleware } from './auth/extractAT.middleware';
   ],
   exports: [UsersRepository],
 })
-export class AppModule implements NestModule {
+export class AppModule {} /*implements NestModule {
   async configure(consumer: MiddlewareConsumer) {
     await consumer
       .apply(ExtractATMiddleware)
@@ -111,4 +105,4 @@ export class AppModule implements NestModule {
         { path: 'blogs/:blogId/posts', method: RequestMethod.GET },
       );
   }
-}
+}*/
