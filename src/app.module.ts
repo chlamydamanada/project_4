@@ -1,52 +1,49 @@
-import { ConfigModule } from '@nestjs/config';
+import { configModule } from './configuration/configModule'; //should be first in imports
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { BlogsController } from './api/controllers/blog.controller';
-import { BlogsService } from './application/blogs.service';
-import { BlogsQweryRepository } from './api/repositoriesQwery/blogsQwery.repository';
-import { CommentsController } from './api/controllers/comment.controller';
-import { PostsController } from './api/controllers/post.controller';
-import { UsersController } from './api/controllers/user.controller';
-import { UsersService } from './application/users.service';
-import { UsersQweryRepository } from './api/repositoriesQwery/usersQwery.repository';
-import { UsersRepository } from './repositories/users.repository';
-import { PostsService } from './application/posts.service';
-import { PostsQweryRepository } from './api/repositoriesQwery/postsQwery.repository';
-import { CommentsQweryRepository } from './api/repositoriesQwery/commentsQwery.repository';
-import { BlogModel } from './domain/blog.schema';
-import { BlogsRepository } from './repositories/blogs.repository';
-import { PostModel } from './domain/post.schema';
-import { UserModel } from './domain/user.schema';
-import { CommentModel } from './domain/comment.schema';
-import { PostsRepository } from './repositories/posts.repository';
-import { AllTestingDataController } from './api/controllers/all-testing-data.controller';
-import { CommentService } from './application/comments.service';
-import { CommentsRepository } from './repositories/comments.repository';
+import { BlogsController } from './modules/blogs/api/controller/blog.controller';
+import { BlogsService } from './modules/blogs/application/blogs.service';
+import { BlogsQweryRepository } from './modules/blogs/api/qweryRepositories/blogsQwery.repository';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthController } from './auth/auth.controller';
-import { AuthService } from './auth/auth.service';
-import { PasswordStrategy } from './auth/strategies/pass.strategy';
-import { AccessTokenStrategy } from './auth/strategies/accessTokent.strategy';
-import { MailModule } from './email/email.module';
-import { DeviceModel } from './domain/device.schema';
-import { DevicesController } from './api/controllers/device.controller';
-import { DevicesService } from './application/device.service';
-import { DevicesQweryRepository } from './api/repositoriesQwery/deviceQwery.repository';
-import { DevicesRepository } from './repositories/device.repository';
-import { RefreshTokenStrategy } from './auth/strategies/refreshToken.strategy';
-import { StatusModel } from './domain/status.schema';
+import { AuthController } from './modules/auth/auth.controller';
+import { AuthService } from './modules/auth/auth.service';
+import { PasswordStrategy } from './modules/auth/strategies/pass.strategy';
+import { AccessTokenStrategy } from './modules/auth/strategies/accessTokent.strategy';
+import { MailModule } from './modules/email/email.module';
+import { DeviceModel } from './modules/devices/domain/device.schema';
+import { DevicesRepository } from './modules/devices/repositories/device.repository';
+import { RefreshTokenStrategy } from './modules/auth/strategies/refreshToken.strategy';
 import { IsBlogExistValidator } from './helpers/validators/isBlogExistById.validator';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { CommentsRepository } from './modules/comments/repositories/comments.repository';
+import { DevicesQweryRepository } from './modules/devices/api/qweryRepositories/deviceQwery.repository';
+import { UsersService } from './modules/users/application/users.service';
+import { PostsQweryRepository } from './modules/posts/api/qweryRepositories/postsQwery.repository';
+import { CommentsController } from './modules/comments/api/controllers/comment.controller';
+import { AllTestingDataController } from './modules/testingAllData/api/controllers/all-testing-data.controller';
+import { UsersQweryRepository } from './modules/users/api/qweryRepositories/usersQwery.repository';
+import { BlogModel } from './modules/blogs/domain/blog.schema';
+import { PostsController } from './modules/posts/api/controller/post.controller';
+import { DevicesService } from './modules/devices/application/device.service';
+import { UsersRepository } from './modules/users/repositories/users.repository';
+import { DevicesController } from './modules/devices/api/controller/device.controller';
+import { UserModel } from './modules/users/domain/user.schema';
+import { UsersController } from './modules/users/api/controller/user.controller';
+import { PostsService } from './modules/posts/application/posts.service';
+import { CommentService } from './modules/comments/application/comments.service';
+import { PostsRepository } from './modules/posts/repositories/posts.repository';
+import { CommentsQweryRepository } from './modules/comments/api/qweryRepositories/commentsQwery.repository';
+import { BlogsRepository } from './modules/blogs/repositories/blogs.repository';
+import { StatusModel } from './modules/status/domain/status.schema';
+import { PostModel } from './modules/posts/domain/post.schema';
+import { CommentModel } from './modules/comments/domain/comment.schema';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: '.env',
-      isGlobal: true,
-    }),
+    configModule,
     MongooseModule.forRoot(process.env.MONGO_URL!),
     MongooseModule.forFeature([
       BlogModel,

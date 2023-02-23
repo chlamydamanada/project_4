@@ -61,6 +61,11 @@ export const blogsData = {
     description: 'Some valid string',
     websiteUrl: 'https://Pavel-test.com',
   },
+  validBlog_12: {
+    name: 'Anna',
+    description: 'Some valid string',
+    websiteUrl: 'https://anna-test.com',
+  },
   invalidBlog_name_1: {
     name: '',
     description: 'Some valid string',
