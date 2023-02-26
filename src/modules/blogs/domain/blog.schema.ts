@@ -1,10 +1,13 @@
-import mongoose, { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type BlogEntity = HydratedDocument<Blog>;
 
 @Schema()
 export class Blog {
+  @Prop({ required: true })
+  ownerId: string;
+
   @Prop({ required: true })
   name: string;
 
@@ -21,16 +24,17 @@ export class Blog {
   isMembership: boolean;
 
   createBlog(blogDto) {
+    this.ownerId = blogDto.bloggerId;
     this.name = blogDto.name;
     this.description = blogDto.description;
     this.websiteUrl = blogDto.websiteUrl;
     this.createdAt = new Date().toISOString();
     this.isMembership = false;
   }
-  updateBlog(name, description, websiteUrl) {
-    this.name = name;
-    this.description = description;
-    this.websiteUrl = websiteUrl;
+  updateBlog(blogDto) {
+    this.name = blogDto.name;
+    this.description = blogDto.description;
+    this.websiteUrl = blogDto.websiteUrl;
   }
 }
 

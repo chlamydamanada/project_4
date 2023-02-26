@@ -38,7 +38,7 @@ export class DevicesController {
   @UseGuards(RefreshTokenGuard)
   async deleteAllDevicesByIdExceptThis(
     @CurrentUserIdDeviceId() user: UserIdDeviceIdType,
-  ) {
+  ): Promise<void> {
     await this.devicesService.deleteAllDevicesByIdExceptThis(user);
     return;
   }
@@ -49,7 +49,7 @@ export class DevicesController {
   async deleteDeviceById(
     @CurrentUserIdDeviceId() user: UserIdDeviceIdType,
     @Param('deviceId') deviceId: string,
-  ) {
+  ): Promise<void> {
     await this.devicesService.deleteDeviceByDeviceId(deviceId, user.id);
     return;
   }

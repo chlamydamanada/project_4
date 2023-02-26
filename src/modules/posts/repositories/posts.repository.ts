@@ -34,6 +34,14 @@ export class PostsRepository {
     return post;
   }
 
+  async findPostByPostIdAndBlogId(postId: string, blogId: string) {
+    const post = await this.postModel.findOne({
+      _id: new Types.ObjectId(postId),
+      blogId: blogId,
+    });
+    return post;
+  }
+
   async findStatusOfPost(
     entity: string,
     postId: string,
@@ -52,11 +60,6 @@ export class PostsRepository {
     await this.postModel.deleteOne({
       _id: new Types.ObjectId(postId),
     });
-    return;
-  }
-
-  async deleteAllPosts(): Promise<void> {
-    await this.postModel.deleteMany({});
     return;
   }
 }

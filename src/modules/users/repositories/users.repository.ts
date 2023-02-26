@@ -31,11 +31,6 @@ export class UsersRepository {
     return;
   }
 
-  async deleteAllUsers(): Promise<void> {
-    await this.userModel.deleteMany({});
-    return;
-  }
-
   async findUserByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<undefined | UserEntity> {

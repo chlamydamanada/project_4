@@ -9,14 +9,14 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { CommentsQweryRepository } from '../qweryRepositories/commentsQwery.repository';
-import { AccessTokenGuard } from '../../../auth/guards/accessTokenAuth.guard';
-import { CommentService } from '../../application/comments.service';
-import { ExtractUserIdFromAT } from '../../../auth/guards/extractUserIdFromAT.guard';
-import { CurrentUserId } from '../../../../helpers/decorators/currentUserId.decorator';
-import { StatusPipe } from '../../../status/api/pipes/statusPipe';
-import { commentInputDtoPipe } from '../pipes/commentInputDtoPipe';
-import { CommentViewType } from '../../commentsTypes/commentViewType';
+import { CommentsQweryRepository } from './qweryRepositories/commentsQwery.repository';
+import { AccessTokenGuard } from '../../auth/guards/accessTokenAuth.guard';
+import { CommentService } from '../application/comments.service';
+import { ExtractUserIdFromAT } from '../../auth/guards/extractUserIdFromAT.guard';
+import { CurrentUserId } from '../../../helpers/decorators/currentUserId.decorator';
+import { StatusPipe } from '../../status/api/pipes/statusPipe';
+import { commentInputDtoPipe } from './pipes/commentInputDtoPipe';
+import { CommentViewType } from '../commentsTypes/commentViewType';
 
 @Controller('comments')
 export class CommentsController {

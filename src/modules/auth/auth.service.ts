@@ -104,10 +104,11 @@ export class AuthService {
   async registerUser(userInputModel: UserInputModelType): Promise<void> {
     const newUserId = await this.usersService.createUser(userInputModel);
     const newUser = await this.usersRepository.findUserById(newUserId);
+    if (!newUser) throw new NotFoundException();
     await this.mailService.sendRegistrationEmail(
       newUser!.emailConfirmation.confirmationCode,
       newUser!.email,
-    ); //todo need to delete user, if email didn't send???
+    );
     return;
   }
 

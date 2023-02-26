@@ -42,8 +42,8 @@ describe('AppController', () => {
   beforeAll(async () => {
     await request(server).delete('/testing/all-data').expect(204);
   });
-  describe('GET/ should return [] blogs with default pagination', () => {
-    it('should return [] blogs with default pagination: STATUS 200', async () => {
+  describe('GET/ should return [] without blogs with default qwery', () => {
+    it('should return [] without blogs with default qwery: STATUS 200', async () => {
       await request(server).get('/blogs').expect(200, blogsData.emptyBlogs);
     });
     describe('CREATE -> GET one blog with correct data and return it in view form', () => {
@@ -212,7 +212,7 @@ describe('AppController', () => {
           .expect(204);
       });
       it('shouldn`t return new blog by blogId: STATUS 404', async () => {
-        const blog = await request(server).get(`/blogs/${blogId}`).expect(404);
+        await request(server).get(`/blogs/${blogId}`).expect(404);
       });
     });
 

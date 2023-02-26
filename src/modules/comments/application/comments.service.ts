@@ -106,10 +106,4 @@ export class CommentService {
     await this.commentsRepository.saveStatus(statusOfComment);
     return;
   }
-
-  async deleteAllComments(): Promise<void> {
-    /** used to delete all comments*/
-    await this.commentsRepository.deleteAllComments();
-    return;
-  }
 }

@@ -1,37 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { BlogsRepository } from '../repositories/blogs.repository';
-import { blogInputDtoType } from '../types/blogInputModelType';
+import { creatingBlogDtoType } from '../types/creatingBlogDtoType';
+import { UpdatingBlogDtoType } from '../types/updatingBlogDtoType';
 
 @Injectable()
 export class BlogsService {
   constructor(private readonly blogsRepository: BlogsRepository) {}
 
-  async createBlog(blogDTO: blogInputDtoType): Promise<string> {
+  async createBlog(blogDTO: creatingBlogDtoType): Promise<string> {
+    //find user by blogger id. take login and put to new blog
     const newBlog = this.blogsRepository.getBlogEntity();
     newBlog.createBlog(blogDTO);
-    const newBlogId = await this.blogsRepository.saveBlog(newBlog);
-    return newBlogId;
+    return this.blogsRepository.saveBlog(newBlog);
   }
 
-  async updateBlog(
-    blogId: string,
-    name: string,
-    description: string,
-    websiteUrl: string,
-  ): Promise<boolean> {
-    const blog = await this.blogsRepository.findBlogById(blogId);
-    if (!blog) return false;
-    blog.updateBlog(name, description, websiteUrl);
+  async updateBlog(blogDTO: UpdatingBlogDtoType): Promise<void> {
+    const blog = await this.blogsRepository.findBlogById(blogDTO.blogId);
+    if (!blog) throw new NotFoundException('Blog with this id does not exist');
+    if (blog.ownerId !== blogDTO.bloggerId)
+      throw new ForbiddenException('Only owner of this blog can update it');
+    blog.updateBlog(blogDTO);
     await this.blogsRepository.saveBlog(blog);
-    return true;
-  }
-  async deleteBlogByBlogId(blogId: string): Promise<void> {
-    await this.blogsRepository.deleteBlog(blogId);
     return;
   }
-
-  async deleteAllBlogs(): Promise<void> {
-    await this.blogsRepository.deleteAllBlogs();
+  async deleteBlogByBlogId(blogId: string, bloggerId: string): Promise<void> {
+    const blog = await this.blogsRepository.findBlogById(blogId);
+    if (!blog) throw new NotFoundException('Blog with this id does not exist');
+    if (blog.ownerId !== bloggerId)
+      throw new ForbiddenException('Only owner of this blog can delete it');
+    await this.blogsRepository.deleteBlog(blogId);
     return;
   }
 }

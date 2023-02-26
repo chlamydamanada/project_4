@@ -54,8 +54,4 @@ export class CommentsRepository {
     await this.commentModel.deleteOne({ _id: new Types.ObjectId(commentId) });
     return;
   }
-  async deleteAllComments(): Promise<void> {
-    await this.commentModel.deleteMany({});
-    return;
-  }
 }

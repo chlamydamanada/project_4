@@ -32,8 +32,4 @@ export class BlogsRepository {
     });
     return;
   }
-  async deleteAllBlogs(): Promise<void> {
-    await this.blogModel.deleteMany({});
-    return;
-  }
 }

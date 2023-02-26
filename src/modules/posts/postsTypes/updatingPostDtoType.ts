@@ -3,4 +3,6 @@ export type updatingPostDtoType = {
   shortDescription: string;
   content: string;
   blogId: string;
+  postId: string;
+  bloggerId: string;
 };

@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { BlogsRepository } from '../../blogs/repositories/blogs.repository';
 import { creatingPostDtoType } from '../postsTypes/creatingDtoType';
 import { PostsRepository } from '../repositories/posts.repository';
 import { StatusPipe } from '../../status/api/pipes/statusPipe';
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { updatingPostDtoType } from '../postsTypes/updatingPostDtoType';
+import { DeletingDtoType } from '../postsTypes/deletingDtoType';
 
 @Injectable()
 export class PostsService {
@@ -16,22 +21,24 @@ export class PostsService {
   async createPost(postDto: creatingPostDtoType): Promise<string> {
     const blog = await this.blogsRepository.findBlogById(postDto.blogId);
     if (!blog) throw new NotFoundException('Blog with this id does not exist');
+    if (blog.ownerId !== postDto.bloggerId)
+      throw new ForbiddenException('Only owner of this blog can create post');
     const newPost = this.postsRepository.getPostEntity();
     newPost.createPost(postDto, blog.name);
     const newPostId = await this.postsRepository.savePost(newPost);
     return newPostId;
   }
 
-  async updatePost(
-    postDto: updatingPostDtoType,
-    postId: string,
-  ): Promise<void> {
+  async updatePost(postDto: updatingPostDtoType): Promise<void> {
     const blog = await this.blogsRepository.findBlogById(postDto.blogId);
     if (!blog) throw new NotFoundException('Blog with this id does not exist');
-    const post = await this.postsRepository.findPostById(postId);
+    if (blog.ownerId !== postDto.bloggerId)
+      throw new ForbiddenException('Only owner of this blog can update post');
+    const post = await this.postsRepository.findPostByPostIdAndBlogId(
+      postDto.postId,
+      postDto.blogId,
+    );
     if (!post) throw new NotFoundException('Post with this id does not exist');
-    if (blog.id !== post.blogId)
-      throw new NotFoundException('This post does not belong to this blog');
     post.updatePost(postDto);
     await this.postsRepository.savePost(post);
     return;
@@ -76,13 +83,17 @@ export class PostsService {
     return;
   }
 
-  async deletePostByPostId(postId: string): Promise<void> {
-    await this.postsRepository.deletePost(postId);
-    return;
-  }
-
-  async deleteAllPosts(): Promise<void> {
-    await this.postsRepository.deleteAllPosts();
+  async deletePostByPostId(postDto: DeletingDtoType): Promise<void> {
+    const blog = await this.blogsRepository.findBlogById(postDto.blogId);
+    if (!blog) throw new NotFoundException('Blog with this id does not exist');
+    if (blog.ownerId !== postDto.bloggerId)
+      throw new ForbiddenException('Only owner of this blog can delete post');
+    const post = await this.postsRepository.findPostByPostIdAndBlogId(
+      postDto.postId,
+      postDto.blogId,
+    );
+    if (!post) throw new NotFoundException('Post with this id does not exist');
+    await this.postsRepository.deletePost(postDto.postId);
     return;
   }
 }

@@ -3,4 +3,5 @@ export type creatingPostDtoType = {
   shortDescription: string;
   content: string;
   blogId: string;
+  bloggerId: string;
 };
