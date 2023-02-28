@@ -62,7 +62,10 @@ export class AuthService {
     };
   }
 
-  async createRefreshToken(deviceId: string): Promise<string> {
+  async createRefreshToken(
+    userInfo: UserInfoType,
+    deviceId: string,
+  ): Promise<string> {
     const token = await this.jwtService.signAsync(
       { userId: userInfo.id, userLogin: userInfo.login, deviceId: deviceId },
       {
