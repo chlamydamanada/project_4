@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogEntity } from '../../domain/blog.schema';
 import { Model, Types } from 'mongoose';
-import { makeNameFilter } from '../../../../helpers/helperFunctions/nameFilter';
 import { blogsViewType } from '../../types/blogsViewType';
 import { blogViewType } from '../../types/blogViewType';
 import { blogQueryType } from '../../types/blogsQweryType';
 import { FindAllBlogsByFiltersType } from '../../types/findAllBlogsByFiltersType';
+import { BlogsSAType } from '../../types/blogsSAType';
 
 @Injectable()
 export class BlogsQweryRepository {
@@ -21,7 +21,7 @@ export class BlogsQweryRepository {
   ): Promise<blogsViewType | undefined> {
     // used by blogger with bloggerId,
     // used by users to see all blogs,
-    const filter = makeNameFilter(query.searchNameTerm, bloggerId);
+    const filter = this.makeViewFilter(query.searchNameTerm, bloggerId);
     const dbValues = await this.findAllBlogsByFilters(query, filter);
     // if no blogs found
     if (!dbValues.blogs) return undefined;
@@ -29,16 +29,16 @@ export class BlogsQweryRepository {
     return this.makeViewBlogs(dbValues, query);
   }
 
-  async getAllBlogsForSa(
+  async getAllBlogsBySA(
     query: blogQueryType,
-  ): Promise<blogsViewType | undefined> {
+  ): Promise<BlogsSAType | undefined> {
     // used by sa to see all blogs,
-    const filter = makeNameFilter(query.searchNameTerm);
+    const filter = this.makeNameFilter(query.searchNameTerm);
     const dbValues = await this.findAllBlogsByFilters(query, filter);
     // if no blogs found
     if (!dbValues.blogs) return undefined;
     //if some blogs found
-    return this.makeViewBlogs(dbValues, query);
+    return this.makeBlogsForSA(dbValues, query);
   }
 
   async getBlogByBlogId(blogId: string): Promise<blogViewType | undefined> {
@@ -78,6 +78,32 @@ export class BlogsQweryRepository {
     };
   }
 
+  private makeBlogsForSA(
+    dbValues: FindAllBlogsByFiltersType,
+    query: blogQueryType,
+  ): undefined | BlogsSAType {
+    if (!dbValues.blogs) return undefined;
+    const result = dbValues.blogs.map((b) => ({
+      id: b._id.toString(),
+      name: b.name,
+      description: b.description,
+      websiteUrl: b.websiteUrl,
+      createdAt: b.createdAt,
+      isMembership: b.isMembership,
+      blogOwnerInfo: {
+        userId: b.ownerId,
+        userLogin: b.ownerLogin,
+      },
+    }));
+    return {
+      pagesCount: Math.ceil(dbValues.totalCount / query.pageSize),
+      page: query.pageNumber,
+      pageSize: query.pageSize,
+      totalCount: dbValues.totalCount,
+      items: result,
+    };
+  }
+
   private makeViewBlogs(
     dbValues: FindAllBlogsByFiltersType,
     query: blogQueryType,
@@ -91,5 +117,32 @@ export class BlogsQweryRepository {
       totalCount: dbValues.totalCount,
       items: result,
     };
+  }
+
+  private makeViewFilter(
+    name: string | undefined,
+    bloggerId?: string | null | undefined,
+  ) {
+    if (name && bloggerId) {
+      return {
+        name: { $regex: name, $options: 'i' },
+        ownerId: bloggerId,
+        isOwnerBanned: false,
+      };
+    }
+    if (name) {
+      return { name: { $regex: name, $options: 'i' }, isOwnerBanned: false };
+    }
+    if (bloggerId) {
+      return { ownerId: bloggerId, isOwnerBanned: false };
+    }
+    return { isOwnerBanned: false };
+  }
+
+  makeNameFilter(name: string | undefined) {
+    if (name) {
+      return { name: { $regex: name, $options: 'i' } };
+    }
+    return {};
   }
 }

@@ -10,41 +10,43 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { AuthService } from './auth.service';
-import { PasswordAuthGuard } from './guards/pass.auth.guard';
-import { CurrentUserId } from '../../helpers/decorators/currentUserId.decorator';
-import { AccessTokenGuard } from './guards/accessTokenAuth.guard';
+import { AuthService } from '../application/auth.service';
+import { PasswordAuthGuard } from '../guards/pass.auth.guard';
+import { CurrentUserId } from '../../../helpers/decorators/currentUserId.decorator';
+import { AccessTokenGuard } from '../guards/accessTokenAuth.guard';
 import { CodePipe } from './pipes/codePipe';
 import { EmailPipe } from './pipes/emailPipe';
-import { RefreshTokenGuard } from './guards/refreshTokenAuth.guard';
-import { CurrentUserIdDeviceId } from '../../helpers/decorators/currentUserIdDeviceId';
-import { UserIdDeviceIdType } from './types/userIdDeviceIdType';
+import { RefreshTokenGuard } from '../guards/refreshTokenAuth.guard';
+import { CurrentUserInfoAndDeviceId } from '../../../helpers/decorators/currentUserIdDeviceId';
+import { UserInfoRtType } from '../types/userIdDeviceIdType';
 import { NewPassRecoveryDtoPipe } from './pipes/newPassRecoveryDtoPipe';
-import { AccessTokenViewType } from './types/accessTokenViewType';
-import { MeViweType } from './types/meViweType';
+import { AccessTokenViewType } from '../types/accessTokenViewType';
+import { MeViweType } from '../types/meViweType';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { UsersQweryRepository } from '../users/api/qweryRepositories/usersQwery.repository';
-import { userInputModelPipe } from '../users/api/pipes/userInputDtoPipe';
+import { UsersQueryRepository } from '../../users/api/qweryRepositories/usersQwery.repository';
+import { userInputModelPipe } from '../../users/api/pipes/userInputDtoPipe';
+import { CurrentUserInfo } from '../../../helpers/decorators/currentUserIdAndLogin';
+import { UserInfoType } from '../types/userInfoType';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly usersQweryRepository: UsersQweryRepository,
+    private readonly usersQueryRepository: UsersQueryRepository,
   ) {}
 
   @Post('login')
   @UseGuards(ThrottlerGuard, PasswordAuthGuard)
   @HttpCode(200)
   async login(
-    @CurrentUserId() userId: string,
+    @CurrentUserInfo() userInfo: UserInfoType,
     @Ip() ip: string,
     @Headers('user-agent') deviceTitle: string,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const accessToken = await this.authService.createAccessToken(userId);
+    const accessToken = await this.authService.createAccessToken(userInfo);
     const refreshToken = await this.authService.createRefreshTokenMeta(
-      userId,
+      userInfo,
       ip,
       deviceTitle,
     );
@@ -61,7 +63,7 @@ export class AuthController {
   async getMyProfile(
     @CurrentUserId() userId: string,
   ): Promise<MeViweType | undefined> {
-    return this.usersQweryRepository.getMyProfile(userId);
+    return this.usersQueryRepository.getMyProfile(userId);
     // todo validation user can be undefined!?
   }
 
@@ -95,15 +97,21 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @HttpCode(200)
   async updateTokens(
-    @CurrentUserIdDeviceId() user: UserIdDeviceIdType,
+    @CurrentUserInfoAndDeviceId() userInfo: UserInfoRtType,
     @Ip() ip: string,
     @Headers('user-agent') deviceTitle: string,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AccessTokenViewType> {
-    const accessToken = await this.authService.createAccessToken(user.id);
+    const accessToken = await this.authService.createAccessToken({
+      id: userInfo.id,
+      login: userInfo.login,
+    });
     const refreshToken = await this.authService.updateRefreshTokenMeta(
-      user.id,
-      user.deviceId,
+      {
+        id: userInfo.id,
+        login: userInfo.login,
+      },
+      userInfo.deviceId,
       ip,
       deviceTitle,
     );
@@ -119,10 +127,10 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @HttpCode(204)
   async logout(
-    @CurrentUserIdDeviceId() user: UserIdDeviceIdType,
+    @CurrentUserInfoAndDeviceId() userInfo: UserInfoRtType,
     @Res({ passthrough: true }) response: Response,
   ): Promise<void> {
-    await this.authService.logout(user.deviceId, user.id);
+    await this.authService.logout(userInfo.deviceId, userInfo.id);
     response.clearCookie('refreshToken');
     return;
   }

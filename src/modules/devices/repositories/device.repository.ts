@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Device, DeviceEntity } from '../domain/device.schema';
 import { Model } from 'mongoose';
-import { UserIdDeviceIdType } from '../../auth/types/userIdDeviceIdType';
+import { UserInfoRtType } from '../../auth/types/userIdDeviceIdType';
 
 @Injectable()
 export class DevicesRepository {
@@ -31,11 +31,16 @@ export class DevicesRepository {
     return;
   }
 
-  async deleteAllDevicesByIdExceptThis(user: UserIdDeviceIdType) {
+  async deleteAllDevicesByIdExceptThis(user: UserInfoRtType) {
     await this.deviceModel.deleteMany({
       userId: user.id,
       deviceId: { $ne: user.deviceId },
     });
+    return;
+  }
+
+  async deleteAllUserDevices(userId: string) {
+    await this.deviceModel.deleteMany({ userId: userId });
     return;
   }
 }

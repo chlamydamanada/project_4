@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../application/auth.service';
 import { LoginDto } from '../../../helpers/validators/pass.validator';
 import { validate } from 'class-validator';
 
@@ -21,30 +21,6 @@ export class PasswordStrategy extends PassportStrategy(Strategy) {
     loginOrEmail: string,
     password: string,
   ): Promise<{ id: string } | any> {
-    /*if (
-      !loginOrEmail ||
-      typeof loginOrEmail !== 'string' ||
-      loginOrEmail.length > 50 ||
-      !loginOrEmail.trim()
-    )
-      throw new BadRequestException([
-        {
-          message: 'loginOrEmail is incorrect',
-          field: 'loginOrEmail',
-        },
-      ]);
-    if (
-      !password ||
-      typeof password !== 'string' ||
-      password.length > 20 ||
-      !password.trim()
-    )
-      throw new BadRequestException([
-        {
-          message: 'password is incorrect',
-          field: 'password',
-        },
-      ]);*/
     const loginDto = new LoginDto();
     loginDto.password = password;
     loginDto.loginOrEmail = loginOrEmail;
@@ -58,12 +34,11 @@ export class PasswordStrategy extends PassportStrategy(Strategy) {
         })),
       );
 
-    const userId = await this.authService.checkCredentials(
+    const userInfo = await this.authService.checkCredentials(
       loginDto.loginOrEmail,
       loginDto.password,
     );
-    console.log('userId:', userId);
-    if (!userId) throw new UnauthorizedException();
-    return { id: userId };
+    if (!userInfo) throw new UnauthorizedException();
+    return userInfo;
   }
 }

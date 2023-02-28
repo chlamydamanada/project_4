@@ -22,7 +22,7 @@ export class CommentsQweryRepository {
     const totalCount = await this.commentModel.count({ postId: postId });
     // get array of all comments by filter, get page number by page size
     const comments = await this.commentModel
-      .find({ postId: postId })
+      .find({ postId: postId, isOwnerBanned: false })
       .sort({ [query.sortBy]: query.sortDirection })
       .skip((query.pageNumber - 1) * query.pageSize)
       .limit(query.pageSize);
@@ -45,6 +45,7 @@ export class CommentsQweryRepository {
     //found comment by id
     const comment = await this.commentModel.findOne({
       _id: new Types.ObjectId(commentId),
+      isOwnerBanned: false,
     });
     if (!comment) return undefined;
     //make view type and count the number of likes for this comment
@@ -70,11 +71,13 @@ export class CommentsQweryRepository {
           entityId: comment._id,
           entity: 'comment',
           status: 'Like',
+          isOwnerBanned: false,
         }),
         dislikesCount: await this.statusModel.count({
           entityId: comment._id,
           entity: 'comment',
           status: 'Dislike',
+          isOwnerBanned: false,
         }),
         myStatus: 'None',
       },

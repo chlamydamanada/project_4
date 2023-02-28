@@ -7,6 +7,8 @@ import bcrypt from 'bcrypt';
 import { emailConfirmationType } from '../usersTypes/emailConfirmationType';
 import { PasswordRecoveryInfoType } from '../usersTypes/passwordRecoveryInfoType';
 import { UserInputModelType } from '../usersTypes/userInputModelType';
+import { BanInfoType } from '../usersTypes/banInfoType';
+import { UpdatingBanStatusDtoType } from '../usersTypes/updatingBanStatusDtoType';
 
 export type UserEntity = HydratedDocument<User>;
 
@@ -41,6 +43,15 @@ export class User {
   )
   passwordRecoveryInfo: PasswordRecoveryInfoType;
 
+  @Prop(
+    raw({
+      isBanned: { required: true, type: Boolean },
+      banDate: { type: String },
+      banReason: { type: String },
+    }),
+  )
+  banInfo: BanInfoType;
+
   async createUser(userInputModel: UserInputModelType) {
     this.login = userInputModel.login;
     this.email = userInputModel.email;
@@ -53,10 +64,25 @@ export class User {
     this.emailConfirmation.isConfirmed = false;
     this.passwordRecoveryInfo.recoveryCode = null;
     this.passwordRecoveryInfo.expirationDate = null;
+    this.banInfo.isBanned = false;
+    this.banInfo.banDate = null;
+    this.banInfo.banReason = null;
     await this.generatePasswordHash(userInputModel.password);
   }
 
-  async generatePasswordHash(password) {
+  banOrUnbanUser(banDto: UpdatingBanStatusDtoType) {
+    if (banDto.isBanned) {
+      this.banInfo.isBanned = true;
+      this.banInfo.banDate = new Date().toISOString();
+      this.banInfo.banReason = banDto.banReason;
+    } else {
+      this.banInfo.isBanned = false;
+      this.banInfo.banDate = null;
+      this.banInfo.banReason = null;
+    }
+  }
+
+  async generatePasswordHash(password: string) {
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(password, salt);
     this.passwordHash = hash;
@@ -96,5 +122,6 @@ UserSchema.methods = {
   confirmEmail: User.prototype.confirmEmail,
   generateNewConfirmationCode: User.prototype.generateNewConfirmationCode,
   generatePasswordRecoveryCode: User.prototype.generatePasswordRecoveryCode,
+  banOrUnbanUser: User.prototype.banOrUnbanUser,
 };
 export const UserModel = { name: User.name, schema: UserSchema };

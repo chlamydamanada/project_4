@@ -25,6 +25,9 @@ export class Status {
   @Prop({ required: true })
   addedAt: string;
 
+  @Prop({ required: true })
+  isOwnerBanned: boolean;
+
   createStatus(dto: CreateStatusDtoType) {
     this.entity = dto.entity;
     this.entityId = dto.entityId;
@@ -32,6 +35,7 @@ export class Status {
     this.userLogin = dto.userLogin;
     this.status = dto.status;
     this.addedAt = new Date().toISOString();
+    this.isOwnerBanned = false;
   }
   updateStatus(status: string) {
     this.status = status;

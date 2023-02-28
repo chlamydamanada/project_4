@@ -10,6 +10,7 @@ import { StatusPipe } from '../../status/api/pipes/statusPipe';
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { updatingPostDtoType } from '../postsTypes/updatingPostDtoType';
 import { DeletingDtoType } from '../postsTypes/deletingDtoType';
+import { UserInfoType } from '../../auth/types/userInfoType';
 
 @Injectable()
 export class PostsService {
@@ -46,21 +47,18 @@ export class PostsService {
 
   async generatePostStatusById(
     postId: string,
-    userId: string,
+    userInfo: UserInfoType,
     statusDto: StatusPipe,
   ): Promise<void> {
     //first step: find post by id and check does it exist
     const post = await this.postsRepository.findPostById(postId);
     if (!post) throw new NotFoundException('Post with this id does not exist');
 
-    // second step: find user by id from token
-    const user = await this.usersRepository.findUserById(userId);
-
     //third step: find status for this post by postId, userId and name of entity - post
     const statusOfPost = await this.postsRepository.findStatusOfPost(
       'post',
       postId,
-      userId,
+      userInfo.id,
     );
 
     //if status not found, should create it
@@ -69,8 +67,8 @@ export class PostsService {
       newStatus.createStatus({
         entity: 'post',
         entityId: postId,
-        userId,
-        userLogin: user!.login,
+        userId: userInfo.id,
+        userLogin: userInfo.login,
         status: statusDto.likeStatus,
       });
       await this.postsRepository.saveStatus(newStatus);

@@ -9,10 +9,10 @@ import {
 } from '@nestjs/common';
 import { DevicesService } from '../../application/device.service';
 import { DevicesQweryRepository } from '../qweryRepositories/deviceQwery.repository';
-import { CurrentUserIdDeviceId } from '../../../../helpers/decorators/currentUserIdDeviceId';
 import { DeviceViewType } from '../../devicesTypes/deviceViewType';
-import { UserIdDeviceIdType } from '../../../auth/types/userIdDeviceIdType';
 import { RefreshTokenGuard } from '../../../auth/guards/refreshTokenAuth.guard';
+import { CurrentUserInfoAndDeviceId } from '../../../../helpers/decorators/currentUserIdDeviceId';
+import { UserInfoRtType } from '../../../auth/types/userIdDeviceIdType';
 
 @Controller('security')
 export class DevicesController {
@@ -24,7 +24,7 @@ export class DevicesController {
   @Get('devices')
   @UseGuards(RefreshTokenGuard)
   async getAllDevicesByUserId(
-    @CurrentUserIdDeviceId() user: UserIdDeviceIdType,
+    @CurrentUserInfoAndDeviceId() user: UserInfoRtType,
   ): Promise<DeviceViewType[]> {
     const allDevices = await this.devicesQweryRepository.findDevicesByUserId(
       user.id,
@@ -37,7 +37,7 @@ export class DevicesController {
   @HttpCode(204)
   @UseGuards(RefreshTokenGuard)
   async deleteAllDevicesByIdExceptThis(
-    @CurrentUserIdDeviceId() user: UserIdDeviceIdType,
+    @CurrentUserInfoAndDeviceId() user: UserInfoRtType,
   ): Promise<void> {
     await this.devicesService.deleteAllDevicesByIdExceptThis(user);
     return;
@@ -47,7 +47,7 @@ export class DevicesController {
   @HttpCode(204)
   @UseGuards(RefreshTokenGuard)
   async deleteDeviceById(
-    @CurrentUserIdDeviceId() user: UserIdDeviceIdType,
+    @CurrentUserInfoAndDeviceId() user: UserInfoRtType,
     @Param('deviceId') deviceId: string,
   ): Promise<void> {
     await this.devicesService.deleteDeviceByDeviceId(deviceId, user.id);

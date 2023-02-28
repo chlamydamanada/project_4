@@ -24,6 +24,8 @@ import { BasicAuthGuard } from '../../auth/guards/auth-guard';
 import { postInputModelIdPipe } from '../../posts/api/pipes/postInputDtoPipe';
 import { postViewType } from '../../posts/postsTypes/postViewType';
 import { PostsQweryRepository } from '../../posts/api/qweryRepositories/postsQwery.repository';
+import { CurrentUserInfo } from '../../../helpers/decorators/currentUserIdAndLogin';
+import { UserInfoType } from '../../auth/types/userInfoType';
 
 @UseGuards(AccessTokenGuard)
 @Controller('blogger/blogs')
@@ -51,11 +53,12 @@ export class BloggerController {
   @Post()
   async createBlog(
     @Body() blogInputModel: blogInputModelPipe,
-    @CurrentUserId() bloggerId: string,
+    @CurrentUserInfo() userInfo: UserInfoType,
   ): Promise<blogViewType | string> {
     const newBlogId = await this.blogsService.createBlog({
       ...blogInputModel,
-      bloggerId,
+      bloggerId: userInfo.id,
+      bloggerLogin: userInfo.login,
     });
     const newBlog = await this.blogsQweryRepository.getBlogByBlogId(newBlogId);
     return newBlog!;

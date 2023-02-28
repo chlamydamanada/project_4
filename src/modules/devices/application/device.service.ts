@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { UpdateDeviceDtoType } from '../devicesTypes/updateDeviceDtoType';
 import { CreateDeviceDtoType } from '../devicesTypes/createDeviceDtoType';
-import { UserIdDeviceIdType } from '../../auth/types/userIdDeviceIdType';
+import { UserInfoRtType } from '../../auth/types/userIdDeviceIdType';
 import { DevicesRepository } from '../repositories/device.repository';
 
 @Injectable()
@@ -43,7 +43,7 @@ export class DevicesService {
     return;
   }
 
-  async deleteAllDevicesByIdExceptThis(user: UserIdDeviceIdType) {
+  async deleteAllDevicesByIdExceptThis(user: UserInfoRtType) {
     await this.devicesRepository.deleteAllDevicesByIdExceptThis(user);
     return;
   }

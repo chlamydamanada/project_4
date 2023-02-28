@@ -1,6 +1,8 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { sortingDirection } from '../../../../helpers/helperFunctions/sortingDerection';
+import { reactionStatusType } from '../../../status/statusTypes/statusType';
+import { BanStatusType } from '../../usersTypes/banStatusType';
 
 export class UserQweryPipe {
   @IsNumber()
@@ -18,6 +20,10 @@ export class UserQweryPipe {
 
   @IsOptional()
   searchEmailTerm: string | undefined;
+
+  @IsOptional()
+  @IsEnum(BanStatusType)
+  banStatus: BanStatusType;
 
   @IsOptional()
   sortBy = 'createdAt';

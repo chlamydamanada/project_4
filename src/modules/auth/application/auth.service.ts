@@ -4,17 +4,18 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AccessTokenViewType } from './types/accessTokenViewType';
+import { AccessTokenViewType } from '../types/accessTokenViewType';
 import { v4 as uuidv4 } from 'uuid';
-import { CodeType } from './types/codeType';
-import { MailService } from '../email/email.service';
-import { EmailType } from './types/emailType';
-import { UserInputModelType } from '../users/usersTypes/userInputModelType';
-import { NewPassRecoveryDtoType } from './types/newPassRecoveryDtoType';
+import { CodeType } from '../types/codeType';
+import { MailService } from '../../email/email.service';
+import { EmailType } from '../types/emailType';
+import { UserInputModelType } from '../../users/usersTypes/userInputModelType';
+import { NewPassRecoveryDtoType } from '../types/newPassRecoveryDtoType';
 import { ConfigService } from '@nestjs/config';
-import { UsersService } from '../users/application/users.service';
-import { UsersRepository } from '../users/repositories/users.repository';
-import { DevicesService } from '../devices/application/device.service';
+import { UsersService } from '../../users/application/users.service';
+import { UsersRepository } from '../../users/repositories/users.repository';
+import { DevicesService } from '../../devices/application/device.service';
+import { UserInfoType } from '../types/userInfoType';
 
 @Injectable()
 export class AuthService {
@@ -30,21 +31,29 @@ export class AuthService {
   async checkCredentials(
     loginOrEmail: string,
     password: string,
-  ): Promise<null | string> {
+  ): Promise<null | UserInfoType> {
     const user = await this.usersRepository.findUserByLoginOrEmail(
       loginOrEmail,
-    );
+    ); // check there is user or not
     if (!user) return null;
+    //check user password
     const isMatched = await user.checkPassword(password);
     if (!isMatched) return null;
-    return user._id.toString();
+    // check is user banned or not
+    if (user.banInfo.isBanned) return null;
+    return {
+      id: user._id.toString(),
+      login: user.login,
+    };
   }
 
-  async createAccessToken(userId: string): Promise<AccessTokenViewType> {
+  async createAccessToken(
+    userInfo: UserInfoType,
+  ): Promise<AccessTokenViewType> {
     const token = await this.jwtService.signAsync(
-      { userId: userId },
+      { userId: userInfo.id, userLogin: userInfo.login },
       {
-        expiresIn: '10 seconds',
+        expiresIn: '1000 seconds',
         secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
       },
     );
@@ -53,11 +62,14 @@ export class AuthService {
     };
   }
 
-  async createRefreshToken(userId: string, deviceId: string): Promise<string> {
+  async createRefreshToken(
+    userInfo: UserInfoType,
+    deviceId: string,
+  ): Promise<string> {
     const token = await this.jwtService.signAsync(
-      { userId: userId, deviceId: deviceId },
+      { userId: userInfo.id, userLogin: userInfo.login, deviceId: deviceId },
       {
-        expiresIn: '20 seconds',
+        expiresIn: '2000 seconds',
         secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
       },
     );
@@ -65,12 +77,12 @@ export class AuthService {
   }
 
   async createRefreshTokenMeta(
-    userId: string,
+    userInfo: UserInfoType,
     ip: string,
     deviceTitle: string,
   ): Promise<string> {
     const deviceId = uuidv4();
-    const token = await this.createRefreshToken(userId, deviceId);
+    const token = await this.createRefreshToken(userInfo, deviceId);
     const tokenInfo: any = this.jwtService.decode(token);
     await this.devicesService.createDevice({
       deviceId: tokenInfo.deviceId,
@@ -84,12 +96,12 @@ export class AuthService {
   }
 
   async updateRefreshTokenMeta(
-    userId: string,
+    userInfo: UserInfoType,
     deviceId: string,
     ip: string,
     deviceTitle: string,
   ): Promise<string> {
-    const token = await this.createRefreshToken(userId, deviceId);
+    const token = await this.createRefreshToken(userInfo, deviceId);
     const tokenInfo: any = this.jwtService.decode(token);
     await this.devicesService.updateDevice({
       deviceId: tokenInfo.deviceId,

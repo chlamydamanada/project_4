@@ -17,6 +17,8 @@ import { CurrentUserId } from '../../../helpers/decorators/currentUserId.decorat
 import { StatusPipe } from '../../status/api/pipes/statusPipe';
 import { commentInputDtoPipe } from './pipes/commentInputDtoPipe';
 import { CommentViewType } from '../commentsTypes/commentViewType';
+import { CurrentUserInfo } from '../../../helpers/decorators/currentUserIdAndLogin';
+import { UserInfoType } from '../../auth/types/userInfoType';
 
 @Controller('comments')
 export class CommentsController {
@@ -61,12 +63,12 @@ export class CommentsController {
   @HttpCode(204)
   async updateCommentStatusById(
     @Param('id') commentId: string,
-    @CurrentUserId() userId: string,
+    @CurrentUserInfo() userInfo: UserInfoType,
     @Body() statusDto: StatusPipe,
   ): Promise<void> {
     await this.commentService.generateCommentStatusById(
       commentId,
-      userId,
+      userInfo,
       statusDto,
     );
     return;

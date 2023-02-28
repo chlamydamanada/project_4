@@ -62,4 +62,19 @@ export class PostsRepository {
     });
     return;
   }
+
+  async banOrUnbanPostOwner(userId: string, banStatus: boolean): Promise<void> {
+    await this.postModel.updateMany(
+      { ownerId: userId },
+      { $set: { isOwnerBanned: banStatus } },
+    );
+    await this.statusModel.updateMany(
+      {
+        entity: 'post',
+        userId: userId,
+      },
+      { $set: { isOwnerBanned: banStatus } },
+    );
+    return;
+  }
 }

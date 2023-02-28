@@ -3,4 +3,5 @@ export type creatingBlogDtoType = {
   description: string;
   websiteUrl: string;
   bloggerId: string;
+  bloggerLogin: string;
 };

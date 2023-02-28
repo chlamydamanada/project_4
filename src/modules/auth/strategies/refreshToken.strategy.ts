@@ -30,7 +30,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
 
   async validate(
     payload: RefreshTokenStrategyType,
-  ): Promise<{ id: string; deviceId: string }> {
+  ): Promise<{ id: string; login: string; deviceId: string }> {
     const device = await this.devicesRepository.findDeviceByDeviceId(
       payload.deviceId,
     );
@@ -39,6 +39,10 @@ export class RefreshTokenStrategy extends PassportStrategy(
       throw new UnauthorizedException('refresh token is already invalid');
 
     //console.log('RefreshTokenStrategy:', payload);
-    return { id: payload.userId, deviceId: payload.deviceId };
+    return {
+      id: payload.userId,
+      login: payload.userLogin,
+      deviceId: payload.deviceId,
+    };
   }
 }

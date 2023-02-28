@@ -30,6 +30,8 @@ import { CommentsViewType } from '../../comments/commentsTypes/commentsViewType'
 import { postViewType } from '../postsTypes/postViewType';
 import { postQueryType } from '../postsTypes/postsQweryType';
 import { CommentQweryPipe } from '../../comments/api/pipes/commentQweryPipe';
+import { CurrentUserInfo } from '../../../helpers/decorators/currentUserIdAndLogin';
+import { UserInfoType } from '../../auth/types/userInfoType';
 
 @Controller('posts')
 export class PostsController {
@@ -108,10 +110,10 @@ export class PostsController {
   @HttpCode(204)
   async updatePostStatusById(
     @Param('id') postId: string,
-    @CurrentUserId() userId: string,
+    @CurrentUserInfo() userInfo: UserInfoType,
     @Body() statusDto: StatusPipe,
   ): Promise<void> {
-    await this.postsService.generatePostStatusById(postId, userId, statusDto);
+    await this.postsService.generatePostStatusById(postId, userInfo, statusDto);
     return;
   }
 }

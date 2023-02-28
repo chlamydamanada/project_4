@@ -24,14 +24,23 @@ export class Post {
   @Prop({ required: true })
   createdAt: string;
 
+  @Prop({ required: true })
+  ownerId: string;
+
+  @Prop({ required: true })
+  isOwnerBanned: boolean;
+
   createPost(postDto: creatingPostDtoType, blogName) {
     this.title = postDto.title;
     this.shortDescription = postDto.shortDescription;
     this.content = postDto.content;
     this.blogId = postDto.blogId;
+    this.ownerId = postDto.bloggerId;
     this.blogName = blogName;
     this.createdAt = new Date().toISOString();
+    this.isOwnerBanned = false;
   }
+
   updatePost(postDto) {
     this.title = postDto.title;
     this.shortDescription = postDto.shortDescription;

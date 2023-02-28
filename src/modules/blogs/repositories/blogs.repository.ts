@@ -32,4 +32,11 @@ export class BlogsRepository {
     });
     return;
   }
+
+  async banOrUnbanBlogOwner(userId: string, banStatus: boolean): Promise<void> {
+    await this.blogModel.updateMany(
+      { ownerId: userId },
+      { $set: { isOwnerBanned: banStatus } },
+    );
+  }
 }

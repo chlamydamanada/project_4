@@ -8,6 +8,7 @@ import { PostsRepository } from '../../posts/repositories/posts.repository';
 import { commentInputDtoType } from '../commentsTypes/commentInputDtoType';
 import { StatusPipe } from '../../status/api/pipes/statusPipe';
 import { UsersRepository } from '../../users/repositories/users.repository';
+import { UserInfoType } from '../../auth/types/userInfoType';
 
 @Injectable()
 export class CommentService {
@@ -69,7 +70,7 @@ export class CommentService {
 
   async generateCommentStatusById(
     commentId: string,
-    userId: string,
+    userInfo: UserInfoType,
     statusDto: StatusPipe,
   ): Promise<void> {
     //first step: find comment by id and check does it exist
@@ -77,14 +78,11 @@ export class CommentService {
     if (!comment)
       throw new NotFoundException('Comment with this id does not exist');
 
-    //second step: find user by id from token
-    const user = await this.usersRepository.findUserById(userId);
-
     //third step: find status for this comment by commentId, userId and name of entity
     const statusOfComment = await this.commentsRepository.findStatusOfComment(
       'comment',
       commentId,
-      userId,
+      userInfo.id,
     );
 
     //if status not found, should create it
@@ -93,8 +91,8 @@ export class CommentService {
       newStatus.createStatus({
         entity: 'comment',
         entityId: commentId,
-        userId,
-        userLogin: user!.login,
+        userId: userInfo.id,
+        userLogin: userInfo.login,
         status: statusDto.likeStatus,
       });
       await this.commentsRepository.saveStatus(newStatus);

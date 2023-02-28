@@ -8,8 +8,8 @@ import { BlogsService } from './modules/blogs/application/blogs.service';
 import { BlogsQweryRepository } from './modules/blogs/api/qweryRepositories/blogsQwery.repository';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthController } from './modules/auth/auth.controller';
-import { AuthService } from './modules/auth/auth.service';
+import { AuthController } from './modules/auth/api/auth.controller';
+import { AuthService } from './modules/auth/application/auth.service';
 import { PasswordStrategy } from './modules/auth/strategies/pass.strategy';
 import { AccessTokenStrategy } from './modules/auth/strategies/accessToken.strategy';
 import { MailModule } from './modules/email/email.module';
@@ -24,14 +24,13 @@ import { UsersService } from './modules/users/application/users.service';
 import { PostsQweryRepository } from './modules/posts/api/qweryRepositories/postsQwery.repository';
 import { CommentsController } from './modules/comments/api/comment.controller';
 import { AllTestingDataController } from './modules/testingAllData/api/controllers/all-testing-data.controller';
-import { UsersQweryRepository } from './modules/users/api/qweryRepositories/usersQwery.repository';
+import { UsersQueryRepository } from './modules/users/api/qweryRepositories/usersQwery.repository';
 import { BlogModel } from './modules/blogs/domain/blog.schema';
 import { PostsController } from './modules/posts/api/post.controller';
 import { DevicesService } from './modules/devices/application/device.service';
 import { UsersRepository } from './modules/users/repositories/users.repository';
 import { DevicesController } from './modules/devices/api/controller/device.controller';
 import { UserModel } from './modules/users/domain/user.schema';
-import { UsersController } from './modules/users/api/controller/user.controller';
 import { PostsService } from './modules/posts/application/posts.service';
 import { CommentService } from './modules/comments/application/comments.service';
 import { PostsRepository } from './modules/posts/repositories/posts.repository';
@@ -44,6 +43,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { DeleteAllDataUseCase } from './modules/testingAllData/application/deleteAllData.useCase';
 import { DeleteAllDataRepository } from './modules/testingAllData/repositories/deleteAllData.repository';
 import { BloggerController } from './modules/blogger/api/blogger.controller';
+import { SaController } from './modules/sa/api/sa.controller';
 
 const services = [
   AppService,
@@ -63,7 +63,7 @@ const repositories = [
   CommentsRepository,
   DevicesQweryRepository,
   DevicesRepository,
-  UsersQweryRepository,
+  UsersQueryRepository,
   UsersRepository,
   DeleteAllDataRepository,
 ];
@@ -102,9 +102,9 @@ const validators = [IsBlogExistValidator];
     BloggerController,
     BlogsController,
     PostsController,
-    UsersController,
     CommentsController,
     DevicesController,
+    SaController,
     AllTestingDataController,
   ],
   providers: [

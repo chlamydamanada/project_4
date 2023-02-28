@@ -20,7 +20,7 @@ export class PostsQweryRepository {
   ): Promise<postsViewType> {
     const totalCount = await this.postModel.count({});
     const posts = await this.postModel
-      .find({})
+      .find({ isOwnerBanned: false })
       .sort({ [query.sortBy]: query.sortDirection })
       .skip((query.pageNumber - 1) * query.pageSize)
       .limit(query.pageSize);
@@ -43,7 +43,7 @@ export class PostsQweryRepository {
   ): Promise<postsViewType | null> {
     const totalCount = await this.postModel.count({ blogId: blogId });
     const posts = await this.postModel
-      .find({ blogId: blogId })
+      .find({ blogId: blogId, isOwnerBanned: false })
       .sort({ [query.sortBy]: query.sortDirection })
       .skip((query.pageNumber - 1) * query.pageSize)
       .limit(query.pageSize);
@@ -66,6 +66,7 @@ export class PostsQweryRepository {
   ): Promise<postViewType | undefined> {
     const post = await this.postModel.findOne({
       _id: new Types.ObjectId(postId),
+      isOwnerBanned: false,
     });
     if (!post) return undefined;
     const result = await this.makeViewPost(post, userId);
@@ -88,11 +89,13 @@ export class PostsQweryRepository {
           entityId: post._id,
           entity: 'post',
           status: 'Like',
+          isOwnerBanned: false,
         }),
         dislikesCount: await this.statusModel.count({
           entityId: post._id,
           entity: 'post',
           status: 'Dislike',
+          isOwnerBanned: false,
         }),
         myStatus: 'None',
         newestLikes: [],
@@ -100,7 +103,12 @@ export class PostsQweryRepository {
     };
 
     const newLikes = await this.statusModel
-      .find({ entityId: post._id, entity: 'post', status: 'Like' })
+      .find({
+        entityId: post._id,
+        entity: 'post',
+        status: 'Like',
+        isOwnerBanned: false,
+      })
       .sort({ addedAt: -1 })
       .limit(3)
       .lean();

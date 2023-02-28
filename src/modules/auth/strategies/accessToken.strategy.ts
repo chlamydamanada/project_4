@@ -17,9 +17,11 @@ export class AccessTokenStrategy extends PassportStrategy(
     });
   }
 
-  async validate(payload: AccessTokenStrategyType): Promise<{ id: string }> {
+  async validate(
+    payload: AccessTokenStrategyType,
+  ): Promise<{ id: string; login: string }> {
     //console.log('AccessTokenStrategy:', payload);
     if (!payload) throw new UnauthorizedException();
-    return { id: payload.userId };
+    return { id: payload.userId, login: payload.userLogin };
   }
 }

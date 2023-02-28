@@ -1,4 +1,5 @@
-export type UserIdDeviceIdType = {
+export type UserInfoRtType = {
   id: string;
+  login: string;
   deviceId: string;
 };

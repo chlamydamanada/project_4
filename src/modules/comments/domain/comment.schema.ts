@@ -20,9 +20,13 @@ export class Comment {
   @Prop({ required: true })
   createdAt: string;
 
+  @Prop({ required: true })
+  isOwnerBanned: boolean;
+
   updateComment(dto: commentInputDtoType) {
     this.content = dto.content;
   }
+
   createComment(
     dto: commentInputDtoType,
     postId: string,
@@ -34,6 +38,7 @@ export class Comment {
     this.userId = userId;
     this.userLogin = userLogin;
     this.createdAt = new Date().toISOString();
+    this.isOwnerBanned = false;
   }
 }
 export const CommentSchema = SchemaFactory.createForClass(Comment);

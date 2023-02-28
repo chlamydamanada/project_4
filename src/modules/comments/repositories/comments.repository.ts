@@ -54,4 +54,19 @@ export class CommentsRepository {
     await this.commentModel.deleteOne({ _id: new Types.ObjectId(commentId) });
     return;
   }
+
+  async banOrUnbanCommentsAndLikesOwner(
+    userId: string,
+    banStatus: boolean,
+  ): Promise<void> {
+    await this.commentModel.updateMany(
+      { userId: userId },
+      { $set: { isOwnerBanned: banStatus } },
+    );
+    await this.statusModel.updateMany(
+      { userId: userId, entity: 'comment' },
+      { $set: { isOwnerBanned: banStatus } },
+    );
+    return;
+  }
 }

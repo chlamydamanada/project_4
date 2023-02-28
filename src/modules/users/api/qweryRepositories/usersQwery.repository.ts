@@ -9,12 +9,13 @@ import { UserViewType } from '../../usersTypes/userViewType';
 import { MeViweType } from '../../../auth/types/meViweType';
 
 @Injectable()
-export class UsersQweryRepository {
+export class UsersQueryRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserEntity>) {}
   async getAllUsers(query: userQueryType): Promise<UsersViewType> {
     const loginOrEmailFilter = makeLoginOrEmailFilter(
       query.searchLoginTerm,
       query.searchEmailTerm,
+      query.banStatus,
     );
     const totalCount = await this.userModel.count(loginOrEmailFilter);
     const users = await this.userModel
@@ -50,12 +51,13 @@ export class UsersQweryRepository {
     };
   }
 
-  makeViewUser(user: UserEntity) {
+  makeViewUser(user: UserEntity): UserViewType {
     return {
       id: user._id.toString(),
       login: user.login,
       email: user.email,
       createdAt: user.createdAt,
+      banInfo: user.banInfo,
     };
   }
 }
