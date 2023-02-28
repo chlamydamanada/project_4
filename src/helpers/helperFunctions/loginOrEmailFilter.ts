@@ -6,33 +6,44 @@ export const makeLoginOrEmailFilter = (
   banStatus: BanStatusType,
 ) => {
   const banFilter = makeBanStatusFilter(banStatus);
+
+  console.log('filter:', banFilter);
   if (login && email) {
     return {
-      $or: [
-        { login: { $regex: login, $options: 'i' } },
-        { email: { $regex: email, $options: 'i' } },
+      $and: [
+        {
+          $or: [
+            { login: { $regex: login, $options: 'i' } },
+            { email: { $regex: email, $options: 'i' } },
+          ],
+        },
         banFilter,
       ],
     };
   }
   if (login) {
-    return { login: { $regex: login, $options: 'i' }, banFilter };
+    return {
+      $and: [{ login: { $regex: login, $options: 'i' } }, banFilter],
+    };
   }
   if (email) {
-    return { email: { $regex: email, $options: 'i' }, banFilter };
+    return {
+      $and: [{ email: { $regex: email, $options: 'i' } }, banFilter],
+    };
   } else {
-    return { banFilter };
+    return banFilter;
   }
 };
 
 const makeBanStatusFilter = (banStatus: BanStatusType) => {
+  //if (banStatus === 'banned') return { 'banInfo.isBanned': true };
+  //if (banStatus === 'notBanned') return { 'banInfo.isBanned': false };
   switch (banStatus) {
     case BanStatusType.banned:
       return { 'banInfo.isBanned': true };
     case BanStatusType.notBanned:
       return { 'banInfo.isBanned': false };
-    //if (banStatus === 'banned') return { 'banInfo.isBanned': true };
-    //if (banStatus === 'notBanned') return { 'banInfo.isBanned': false };
+
     default:
       return {
         $or: [{ 'banInfo.isBanned': true }, { 'banInfo.isBanned': false }],

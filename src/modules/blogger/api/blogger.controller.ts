@@ -95,7 +95,6 @@ export class BloggerController {
   }
 
   @Put(':blogId/posts/:postId')
-  @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   async updatePost(
     @Param('blogId') blogId: string,
