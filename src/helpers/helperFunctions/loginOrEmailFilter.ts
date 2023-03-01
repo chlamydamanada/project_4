@@ -1,4 +1,4 @@
-import { BanStatusType } from '../../modules/users/usersTypes/banStatusType';
+import { BanStatusType } from '../../modules/features/superAdmin/users/usersTypes/banStatusType';
 
 export const makeLoginOrEmailFilter = (
   login: string | undefined,
@@ -45,8 +45,7 @@ const makeBanStatusFilter = (banStatus: BanStatusType) => {
       return { 'banInfo.isBanned': false };
 
     default:
-      return {
-        $or: [{ 'banInfo.isBanned': true }, { 'banInfo.isBanned': false }],
-      };
+      return {};
+    //$or: [{ 'banInfo.isBanned': true }, { 'banInfo.isBanned': false }],
   }
 };

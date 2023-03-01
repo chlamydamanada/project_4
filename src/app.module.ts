@@ -3,57 +3,68 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { BlogsController } from './modules/blogs/api/blog.controller';
-import { BlogsService } from './modules/blogs/application/blogs.service';
-import { BlogsQweryRepository } from './modules/blogs/api/qweryRepositories/blogsQwery.repository';
+import { BlogsController } from './modules/features/public/blogs/api/blogPublic.controller';
+import { BlogsQweryRepository } from './modules/features/public/blogs/api/qweryRepositories/blogsQwery.repository';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthController } from './modules/auth/api/auth.controller';
-import { AuthService } from './modules/auth/application/auth.service';
-import { PasswordStrategy } from './modules/auth/strategies/pass.strategy';
-import { AccessTokenStrategy } from './modules/auth/strategies/accessToken.strategy';
+import { AuthController } from './modules/features/public/auth/api/auth.controller';
+import { AuthService } from './modules/features/public/auth/application/auth.service';
+import { PasswordStrategy } from './modules/features/public/auth/strategies/pass.strategy';
+import { AccessTokenStrategy } from './modules/features/public/auth/strategies/accessToken.strategy';
 import { MailModule } from './modules/email/email.module';
-import { DeviceModel } from './modules/devices/domain/device.schema';
-import { DevicesRepository } from './modules/devices/repositories/device.repository';
-import { RefreshTokenStrategy } from './modules/auth/strategies/refreshToken.strategy';
+import { DeviceModel } from './modules/features/public/devices/domain/device.schema';
+import { DevicesRepository } from './modules/features/public/devices/repositories/device.repository';
+import { RefreshTokenStrategy } from './modules/features/public/auth/strategies/refreshToken.strategy';
 import { IsBlogExistValidator } from './helpers/validators/isBlogExistById.validator';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { CommentsRepository } from './modules/comments/repositories/comments.repository';
-import { DevicesQweryRepository } from './modules/devices/api/qweryRepositories/deviceQwery.repository';
-import { UsersService } from './modules/users/application/users.service';
-import { PostsQweryRepository } from './modules/posts/api/qweryRepositories/postsQwery.repository';
-import { CommentsController } from './modules/comments/api/comment.controller';
+import { CommentsRepository } from './modules/features/public/comments/repositories/comments.repository';
+import { DevicesQweryRepository } from './modules/features/public/devices/api/qweryRepositories/deviceQwery.repository';
+import { UsersService } from './modules/features/superAdmin/users/application/users.service';
+import { PostsQweryRepository } from './modules/features/public/posts/api/qweryRepositories/postsQwery.repository';
+import { CommentsController } from './modules/features/public/comments/api/comment.controller';
 import { AllTestingDataController } from './modules/testingAllData/api/controllers/all-testing-data.controller';
-import { UsersQueryRepository } from './modules/users/api/qweryRepositories/usersQwery.repository';
-import { BlogModel } from './modules/blogs/domain/blog.schema';
-import { PostsController } from './modules/posts/api/post.controller';
-import { DevicesService } from './modules/devices/application/device.service';
-import { UsersRepository } from './modules/users/repositories/users.repository';
-import { DevicesController } from './modules/devices/api/controller/device.controller';
-import { UserModel } from './modules/users/domain/user.schema';
-import { PostsService } from './modules/posts/application/posts.service';
-import { CommentService } from './modules/comments/application/comments.service';
-import { PostsRepository } from './modules/posts/repositories/posts.repository';
-import { CommentsQweryRepository } from './modules/comments/api/qweryRepositories/commentsQwery.repository';
-import { BlogsRepository } from './modules/blogs/repositories/blogs.repository';
-import { StatusModel } from './modules/status/domain/status.schema';
-import { PostModel } from './modules/posts/domain/post.schema';
-import { CommentModel } from './modules/comments/domain/comment.schema';
+import { UsersQueryRepository } from './modules/features/superAdmin/users/api/qweryRepositories/usersQwery.repository';
+import { BlogModel } from './modules/features/blogger/blogs/domain/blog.schema';
+import { PostsController } from './modules/features/public/posts/api/post.controller';
+import { DevicesService } from './modules/features/public/devices/application/device.service';
+import { UsersRepository } from './modules/features/superAdmin/users/repositories/users.repository';
+import { DevicesController } from './modules/features/public/devices/api/device.controller';
+import { UserModel } from './modules/features/superAdmin/users/domain/user.schema';
+import { PostsRepository } from './modules/features/blogger/posts/repositories/posts.repository';
+import { CommentsQweryRepository } from './modules/features/public/comments/api/qweryRepositories/commentsQwery.repository';
+import { BlogsRepository } from './modules/features/blogger/blogs/repositories/blogs.repository';
+import { StatusModel } from './modules/features/public/status/domain/status.schema';
+import { PostModel } from './modules/features/blogger/posts/domain/post.schema';
+import { CommentModel } from './modules/features/public/comments/domain/comment.schema';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DeleteAllDataUseCase } from './modules/testingAllData/application/deleteAllData.useCase';
 import { DeleteAllDataRepository } from './modules/testingAllData/repositories/deleteAllData.repository';
-import { BloggerController } from './modules/blogger/api/blogger.controller';
-import { SaController } from './modules/sa/api/sa.controller';
+import { BloggerController } from './modules/features/blogger/blogger.controller';
+import { SaController } from './modules/features/superAdmin/sa.controller';
+import { CreateBlogUseCase } from './modules/features/blogger/blogs/useCases/createBlog.useCase';
+import { UpdateBlogUseCase } from './modules/features/blogger/blogs/useCases/updateBlog.useCase';
+import { DeleteBlogUseCase } from './modules/features/blogger/blogs/useCases/deleteBlog.useCase';
+import { BlogBindToUserUseCase } from './modules/features/superAdmin/blogs/useCases/blogBindToUser.useCase';
+import { CreatePostUseCase } from './modules/features/blogger/posts/useCases/createPost.useCase';
+import { UpdatePostUseCase } from './modules/features/blogger/posts/useCases/updatePost.useCase';
+import { DeletePostUseCase } from './modules/features/blogger/posts/useCases/deletePost.useCase';
+import { GeneratePostLikeStatusUseCase } from './modules/features/public/posts/useCases/generatePostLikeStatus.useCase';
+import { DeleteUserUseCase } from './modules/features/superAdmin/users/useCases/deleteUser.useCase';
+import { BanOrUnbanUserUseCase } from './modules/features/superAdmin/users/useCases/banOrUnbanUser.useCase';
+import { UpdateCommentUseCase } from './modules/features/public/comments/useCases/updateComment.useCase';
+import { DeleteCommentUseCase } from './modules/features/public/comments/useCases/deleteComment.useCase';
+import { CreateCommentUseCase } from './modules/features/public/posts/useCases/createComment.useCase';
+import { GenerateCommentLikeStatusUseCase } from './modules/features/public/comments/useCases/generateCommentLikeStatus.useCase';
+import { DeleteDeviceUseCase } from './modules/features/public/devices/useCases/deleteDevice.useCase';
+import { DeleteAllDevicesExceptThisUseCase } from './modules/features/public/devices/useCases/deleteAllDevicesExceptThis.useCase';
+import { CheckCredentialsUseCase } from './modules/features/public/auth/useCases/checkCredentials.useCase';
+import { CreateATUseCase } from './modules/features/public/auth/useCases/createAT.useCase';
+import { ConfirmEmailUseCase } from './modules/features/public/auth/useCases/confirmEmail.useCase';
+import { CheckEmailIsConfirmedUseCase } from './modules/features/public/auth/useCases/checkEmailIsConfirmed.useCase';
+import { CreateRecoveryCodeUseCase } from './modules/features/public/auth/useCases/createRecoveryCode.useCase';
+import { ChangePasswordUseCase } from './modules/features/public/auth/useCases/changePassword.useCase';
 
-const services = [
-  AppService,
-  AuthService,
-  BlogsService,
-  DevicesService,
-  PostsService,
-  UsersService,
-  CommentService,
-];
+const services = [AppService, AuthService, DevicesService, UsersService];
 const repositories = [
   BlogsQweryRepository,
   BlogsRepository,
@@ -67,7 +78,31 @@ const repositories = [
   UsersRepository,
   DeleteAllDataRepository,
 ];
-const useCases = [DeleteAllDataUseCase];
+const useCases = [
+  DeleteAllDataUseCase,
+  CreateBlogUseCase,
+  UpdateBlogUseCase,
+  DeleteBlogUseCase,
+  BlogBindToUserUseCase,
+  CreatePostUseCase,
+  UpdatePostUseCase,
+  DeletePostUseCase,
+  GeneratePostLikeStatusUseCase,
+  DeleteUserUseCase,
+  BanOrUnbanUserUseCase,
+  UpdateCommentUseCase,
+  DeleteCommentUseCase,
+  CreateCommentUseCase,
+  GenerateCommentLikeStatusUseCase,
+  DeleteDeviceUseCase,
+  DeleteAllDevicesExceptThisUseCase,
+  CheckCredentialsUseCase,
+  CreateATUseCase,
+  ConfirmEmailUseCase,
+  CheckEmailIsConfirmedUseCase,
+  CreateRecoveryCodeUseCase,
+  ChangePasswordUseCase,
+];
 const strategies = [
   PasswordStrategy,
   AccessTokenStrategy,

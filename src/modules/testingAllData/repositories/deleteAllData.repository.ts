@@ -1,12 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Device, DeviceEntity } from '../../devices/domain/device.schema';
+import {
+  Device,
+  DeviceEntity,
+} from '../../features/public/devices/domain/device.schema';
 import { Model } from 'mongoose';
-import { Blog, BlogEntity } from '../../blogs/domain/blog.schema';
-import { Comment, CommentEntity } from '../../comments/domain/comment.schema';
-import { Status, StatusEntity } from '../../status/domain/status.schema';
-import { Post, PostEntity } from '../../posts/domain/post.schema';
-import { User, UserEntity } from '../../users/domain/user.schema';
+import {
+  Blog,
+  BlogEntity,
+} from '../../features/blogger/blogs/domain/blog.schema';
+import {
+  Comment,
+  CommentEntity,
+} from '../../features/public/comments/domain/comment.schema';
+import {
+  Status,
+  StatusEntity,
+} from '../../features/public/status/domain/status.schema';
+import {
+  Post,
+  PostEntity,
+} from '../../features/blogger/posts/domain/post.schema';
+import {
+  User,
+  UserEntity,
+} from '../../features/superAdmin/users/domain/user.schema';
 
 @Injectable()
 export class DeleteAllDataRepository {
