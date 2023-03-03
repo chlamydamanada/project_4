@@ -1,18 +1,30 @@
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Model } from 'mongoose';
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
-
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
 import bcrypt from 'bcrypt';
 import { emailConfirmationType } from '../usersTypes/emailConfirmationType';
 import { PasswordRecoveryInfoType } from '../usersTypes/passwordRecoveryInfoType';
-import { UserInputModelType } from '../usersTypes/userInputModelType';
+import { UserDtoType } from '../usersTypes/userInputModelType';
 import { BanInfoType } from '../usersTypes/banInfoType';
 import { UpdatingBanStatusDtoType } from '../usersTypes/updatingBanStatusDtoType';
 
 export type UserEntity = HydratedDocument<User>;
+export type UserModel = Model<UserEntity> & typeof statics;
 
-@Schema()
+const statics = {
+  createUser(dto: UserDtoType): UserEntity {
+    const user = {
+      login: dto.login,
+    };
+
+    return new this(user);
+  },
+};
+
+@Schema({
+  statics,
+})
 export class User {
   @Prop({ required: true })
   login: string;
@@ -52,7 +64,7 @@ export class User {
   )
   banInfo: BanInfoType;
 
-  async createUser(userInputModel: UserInputModelType) {
+  async createUser(userInputModel: UserDtoType) {
     this.login = userInputModel.login;
     this.email = userInputModel.email;
     this.createdAt = new Date().toISOString();
@@ -81,12 +93,13 @@ export class User {
       this.banInfo.banReason = null;
     }
   }
-
+  //delete
   async generatePasswordHash(password: string) {
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(password, salt);
     this.passwordHash = hash;
   }
+  //delete
   async checkPassword(password) {
     const salt = this.passwordHash.slice(0, 29);
     const checkedHash = await bcrypt.hash(password, salt);

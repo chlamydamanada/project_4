@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserEntity } from '../domain/user.schema';
+import { User, UserEntity, UserModel } from '../domain/user.schema';
 import { Model, Types } from 'mongoose';
 
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectModel(User.name) private userModel: Model<UserEntity>) {}
+  constructor(@InjectModel(User.name) private userModel: UserModel) {}
 
   getUserEntity() {
+    const userEntity = this.userModel.createUser({
+      login: 'string',
+      email: 'fhfh',
+      password: 'gjgjg',
+    });
+    userEntity;
     return new this.userModel();
   }
 
@@ -30,6 +36,14 @@ export class UsersRepository {
     });
     return;
   }
+
+  /*async isUserExist({
+    login,
+    email,
+  }: {
+    login?: string;
+    email?: string;
+  }): /*Promise<{ isExist: boolean; errorField: 'email' | 'login' }>*/
 
   async findUserByLoginOrEmail(
     loginOrEmail: string,

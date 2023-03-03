@@ -7,7 +7,6 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
-import { DevicesService } from '../application/device.service';
 import { DevicesQweryRepository } from './qweryRepositories/deviceQwery.repository';
 import { DeviceViewType } from '../devicesTypes/deviceViewType';
 import { RefreshTokenGuard } from '../../auth/guards/refreshTokenAuth.guard';
@@ -20,7 +19,6 @@ import { DeleteAllDevicesExceptThisCommand } from '../useCases/deleteAllDevicesE
 @Controller('security')
 export class DevicesController {
   constructor(
-    private readonly devicesService: DevicesService,
     private readonly devicesQweryRepository: DevicesQweryRepository,
     private commandBus: CommandBus,
   ) {}

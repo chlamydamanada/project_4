@@ -10,7 +10,6 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { AuthService } from '../application/auth.service';
 import { PasswordAuthGuard } from '../guards/pass.auth.guard';
 import { CurrentUserId } from '../../../../../helpers/decorators/currentUserId.decorator';
 import { AccessTokenGuard } from '../guards/accessTokenAuth.guard';
@@ -29,22 +28,26 @@ import { CurrentUserInfo } from '../../../../../helpers/decorators/currentUserId
 import { UserInfoType } from '../types/userInfoType';
 import { CommandBus } from '@nestjs/cqrs';
 import { DeleteDeviceCommand } from '../../devices/useCases/deleteDevice.useCase';
-import { CreateATCommand } from '../useCases/createAT.useCase';
 import { ConfirmEmailCommand } from '../useCases/confirmEmail.useCase';
 import { CheckEmailIsConfirmedCommand } from '../useCases/checkEmailIsConfirmed.useCase';
 import { CreateRecoveryCodeCommand } from '../useCases/createRecoveryCode.useCase';
 import { ChangePasswordCommand } from '../useCases/changePassword.useCase';
+import { CreateRTMetaCommand } from '../useCases/createRTMeta.useCase';
+import { UpdateRTMetaCommand } from '../useCases/updateRTMeta.useCase';
+import { JwtAdapter } from '../../../../../adapters/jwtAdapter';
+import { UserRegistrationCommand } from '../useCases/userRegistration.useCase';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
     private readonly usersQueryRepository: UsersQueryRepository,
+    private readonly jwtAdapter: JwtAdapter,
     private commandBus: CommandBus,
   ) {}
 
   @Post('login')
-  @UseGuards(/*ThrottlerGuard,*/ PasswordAuthGuard)
+  //@UseGuards(ThrottlerGuard)
+  @UseGuards(PasswordAuthGuard)
   @HttpCode(200)
   async login(
     @CurrentUserInfo() userInfo: UserInfoType,
@@ -52,13 +55,9 @@ export class AuthController {
     @Headers('user-agent') deviceTitle: string,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const accessToken = await this.commandBus.execute(
-      new CreateATCommand(userInfo),
-    );
-    const refreshToken = await this.authService.createRefreshTokenMeta(
-      userInfo,
-      ip,
-      deviceTitle,
+    const accessToken = await this.jwtAdapter.createAccessToken(userInfo);
+    const refreshToken = await this.commandBus.execute(
+      new CreateRTMetaCommand(userInfo, ip, deviceTitle),
     );
     console.log('refreshToken:', refreshToken);
     response.cookie('refreshToken', refreshToken, {
@@ -83,7 +82,7 @@ export class AuthController {
   async registration(
     @Body() userInputModel: userInputModelPipe,
   ): Promise<void> {
-    await this.authService.registerUser(userInputModel);
+    await this.commandBus.execute(new UserRegistrationCommand(userInputModel));
     return;
   }
 
@@ -112,20 +111,20 @@ export class AuthController {
     @Headers('user-agent') deviceTitle: string,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AccessTokenViewType> {
-    const accessToken = await this.commandBus.execute(
-      new CreateATCommand({
-        id: userInfo.id,
-        login: userInfo.login,
-      }),
-    );
-    const refreshToken = await this.authService.updateRefreshTokenMeta(
-      {
-        id: userInfo.id,
-        login: userInfo.login,
-      },
-      userInfo.deviceId,
-      ip,
-      deviceTitle,
+    const accessToken = await this.jwtAdapter.createAccessToken({
+      id: userInfo.id,
+      login: userInfo.login,
+    });
+    const refreshToken = await this.commandBus.execute(
+      new UpdateRTMetaCommand(
+        {
+          id: userInfo.id,
+          login: userInfo.login,
+        },
+        userInfo.deviceId,
+        ip,
+        deviceTitle,
+      ),
     );
     console.log(refreshToken);
     response.cookie('refreshToken', refreshToken, {

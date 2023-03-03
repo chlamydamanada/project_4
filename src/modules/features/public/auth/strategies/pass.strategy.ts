@@ -1,15 +1,9 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-
-import { LoginDto } from '../../../../../helpers/validators/pass.validator';
-import { validate } from 'class-validator';
 import { CommandBus } from '@nestjs/cqrs';
 import { CheckCredentialsCommand } from '../useCases/checkCredentials.useCase';
+import { validateLoginOrEmail } from '../../../../../helpers/validators/validateLoginOrEmail';
 
 @Injectable()
 export class PasswordStrategy extends PassportStrategy(Strategy) {
@@ -23,23 +17,13 @@ export class PasswordStrategy extends PassportStrategy(Strategy) {
     loginOrEmail: string,
     password: string,
   ): Promise<{ id: string } | any> {
-    const loginDto = new LoginDto();
-    loginDto.password = password;
-    loginDto.loginOrEmail = loginOrEmail;
-
-    const errors = await validate(loginDto);
-    if (errors.length > 0)
-      throw new BadRequestException(
-        errors.map((e) => ({
-          message: Object.values(e.constraints!)[0],
-          field: e.property,
-        })),
-      );
-
+    // validate input loginOrEmail and password
+    await validateLoginOrEmail(loginOrEmail, password);
+    //if input values are correct, check credentials
     const userInfo = await this.commandBus.execute(
-      new CheckCredentialsCommand(loginDto.loginOrEmail, loginDto.password),
+      new CheckCredentialsCommand(loginOrEmail, password),
     );
-
+    // if user isn`t found in db, should take error
     if (!userInfo) throw new UnauthorizedException();
     return userInfo;
   }

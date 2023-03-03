@@ -1,7 +1,7 @@
 import { EmailType } from '../types/emailType';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../superAdmin/users/repositories/users.repository';
-import { MailService } from '../../../../email/email.service';
+import { MailService } from '../../../../../adapters/email/email.service';
 import { BadRequestException } from '@nestjs/common';
 
 export class CheckEmailIsConfirmedCommand {

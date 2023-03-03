@@ -1,9 +1,9 @@
 import { UserInfoType } from '../types/userInfoType';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DevicesService } from '../../devices/application/device.service';
-import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
-import { ConfigService } from '@nestjs/config';
+import { CreateDeviceDtoType } from '../../devices/devicesTypes/createDeviceDtoType';
+import { DevicesRepository } from '../../devices/repositories/device.repository';
+import { JwtAdapter } from '../../../../../adapters/jwtAdapter';
 
 export class CreateRTMetaCommand {
   constructor(
@@ -17,15 +17,20 @@ export class CreateRTMetaUseCase
   implements ICommandHandler<CreateRTMetaCommand>
 {
   constructor(
-    private readonly devicesService: DevicesService,
-    private readonly jwtService: JwtService,
-    private configService: ConfigService,
+    private readonly jwtAdapter: JwtAdapter,
+    private readonly devicesRepository: DevicesRepository,
   ) {}
   async execute(command: CreateRTMetaCommand): Promise<string> {
     const deviceId = uuidv4();
-    const token = await this.createRefreshToken(command.userInfo, deviceId);
-    const tokenInfo: any = this.jwtService.decode(token);
-    await this.devicesService.createDevice({
+    //  create refresh token
+    const token = await this.jwtAdapter.createRefreshToken(
+      command.userInfo,
+      deviceId,
+    );
+    // decode token to take iat and exp
+    const tokenInfo: any = this.jwtAdapter.decodeToken(token);
+    // create device session
+    await this.createDevice({
       deviceId: tokenInfo.deviceId,
       ip: command.ip,
       title: command.deviceTitle,
@@ -35,17 +40,11 @@ export class CreateRTMetaUseCase
     });
     return token;
   }
-  private async createRefreshToken(
-    userInfo: UserInfoType,
-    deviceId: string,
-  ): Promise<string> {
-    const token = await this.jwtService.signAsync(
-      { userId: userInfo.id, userLogin: userInfo.login, deviceId: deviceId },
-      {
-        expiresIn: '2000 seconds',
-        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
-      },
-    );
-    return token;
+
+  private async createDevice(deviceDto: CreateDeviceDtoType): Promise<string> {
+    const newDevice = this.devicesRepository.getDeviceEntity();
+    newDevice.createDevice(deviceDto);
+    const newDeviceId = await this.devicesRepository.saveDevice(newDevice);
+    return newDeviceId;
   }
 }

@@ -12,7 +12,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BlogsQweryRepository } from '../public/blogs/api/qweryRepositories/blogsQwery.repository';
-import { UsersService } from './users/application/users.service';
 import { UsersQueryRepository } from './users/api/qweryRepositories/usersQwery.repository';
 import { BasicAuthGuard } from '../public/auth/guards/auth-guard';
 import { BlogQweryPipe } from '../public/blogs/api/pipes/blogQweryPipe';
@@ -26,13 +25,13 @@ import { CommandBus } from '@nestjs/cqrs';
 import { BlogBindToUserCommand } from './blogs/useCases/blogBindToUser.useCase';
 import { DeleteUserCommand } from './users/useCases/deleteUser.useCase';
 import { BanOrUnbanUserCommand } from './users/useCases/banOrUnbanUser.useCase';
+import { CreateUserCommand } from './users/useCases/createUser.useCase';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa')
 export class SaController {
   constructor(
     private readonly blogsQueryRepository: BlogsQweryRepository,
-    private readonly usersService: UsersService,
     private readonly usersQueryRepository: UsersQueryRepository,
     private commandBus: CommandBus,
   ) {}
@@ -66,7 +65,9 @@ export class SaController {
 
   @Post('users')
   async createUser(@Body() userInputModel: userInputModelPipe) {
-    const newUserId = await this.usersService.createUser(userInputModel);
+    const newUserId = await this.commandBus.execute(
+      new CreateUserCommand(userInputModel),
+    );
     const newUser = await this.usersQueryRepository.getUserByUserId(newUserId);
     return newUser!;
   }

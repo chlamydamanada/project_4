@@ -8,10 +8,9 @@ import { BlogsQweryRepository } from './modules/features/public/blogs/api/qweryR
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './modules/features/public/auth/api/auth.controller';
-import { AuthService } from './modules/features/public/auth/application/auth.service';
 import { PasswordStrategy } from './modules/features/public/auth/strategies/pass.strategy';
 import { AccessTokenStrategy } from './modules/features/public/auth/strategies/accessToken.strategy';
-import { MailModule } from './modules/email/email.module';
+import { MailModule } from './adapters/email/email.module';
 import { DeviceModel } from './modules/features/public/devices/domain/device.schema';
 import { DevicesRepository } from './modules/features/public/devices/repositories/device.repository';
 import { RefreshTokenStrategy } from './modules/features/public/auth/strategies/refreshToken.strategy';
@@ -19,14 +18,12 @@ import { IsBlogExistValidator } from './helpers/validators/isBlogExistById.valid
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CommentsRepository } from './modules/features/public/comments/repositories/comments.repository';
 import { DevicesQweryRepository } from './modules/features/public/devices/api/qweryRepositories/deviceQwery.repository';
-import { UsersService } from './modules/features/superAdmin/users/application/users.service';
 import { PostsQweryRepository } from './modules/features/public/posts/api/qweryRepositories/postsQwery.repository';
 import { CommentsController } from './modules/features/public/comments/api/comment.controller';
 import { AllTestingDataController } from './modules/testingAllData/api/controllers/all-testing-data.controller';
 import { UsersQueryRepository } from './modules/features/superAdmin/users/api/qweryRepositories/usersQwery.repository';
 import { BlogModel } from './modules/features/blogger/blogs/domain/blog.schema';
 import { PostsController } from './modules/features/public/posts/api/post.controller';
-import { DevicesService } from './modules/features/public/devices/application/device.service';
 import { UsersRepository } from './modules/features/superAdmin/users/repositories/users.repository';
 import { DevicesController } from './modules/features/public/devices/api/device.controller';
 import { UserModel } from './modules/features/superAdmin/users/domain/user.schema';
@@ -58,13 +55,17 @@ import { GenerateCommentLikeStatusUseCase } from './modules/features/public/comm
 import { DeleteDeviceUseCase } from './modules/features/public/devices/useCases/deleteDevice.useCase';
 import { DeleteAllDevicesExceptThisUseCase } from './modules/features/public/devices/useCases/deleteAllDevicesExceptThis.useCase';
 import { CheckCredentialsUseCase } from './modules/features/public/auth/useCases/checkCredentials.useCase';
-import { CreateATUseCase } from './modules/features/public/auth/useCases/createAT.useCase';
 import { ConfirmEmailUseCase } from './modules/features/public/auth/useCases/confirmEmail.useCase';
 import { CheckEmailIsConfirmedUseCase } from './modules/features/public/auth/useCases/checkEmailIsConfirmed.useCase';
 import { CreateRecoveryCodeUseCase } from './modules/features/public/auth/useCases/createRecoveryCode.useCase';
 import { ChangePasswordUseCase } from './modules/features/public/auth/useCases/changePassword.useCase';
+import { CreateRTMetaUseCase } from './modules/features/public/auth/useCases/createRTMeta.useCase';
+import { UpdateRTMetaUseCase } from './modules/features/public/auth/useCases/updateRTMeta.useCase';
+import { CreateUserUseCase } from './modules/features/superAdmin/users/useCases/createUser.useCase';
+import { UserRegistrationUseCase } from './modules/features/public/auth/useCases/userRegistration.useCase';
+import { JwtAdapter } from './adapters/jwtAdapter';
 
-const services = [AppService, AuthService, DevicesService, UsersService];
+const services = [AppService];
 const repositories = [
   BlogsQweryRepository,
   BlogsRepository,
@@ -97,11 +98,14 @@ const useCases = [
   DeleteDeviceUseCase,
   DeleteAllDevicesExceptThisUseCase,
   CheckCredentialsUseCase,
-  CreateATUseCase,
   ConfirmEmailUseCase,
   CheckEmailIsConfirmedUseCase,
   CreateRecoveryCodeUseCase,
   ChangePasswordUseCase,
+  CreateRTMetaUseCase,
+  UpdateRTMetaUseCase,
+  CreateUserUseCase,
+  UserRegistrationUseCase,
 ];
 const strategies = [
   PasswordStrategy,
@@ -109,6 +113,8 @@ const strategies = [
   RefreshTokenStrategy,
 ];
 const validators = [IsBlogExistValidator];
+
+const adapters = [JwtAdapter];
 
 @Module({
   imports: [
@@ -148,6 +154,7 @@ const validators = [IsBlogExistValidator];
     ...repositories,
     ...strategies,
     ...validators,
+    ...adapters,
   ],
   //exports: [UsersRepository],
 })
