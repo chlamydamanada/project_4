@@ -1,12 +1,14 @@
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { UserInfoType } from '../modules/features/public/auth/types/userInfoType';
 import { AccessTokenViewType } from '../modules/features/public/auth/types/accessTokenViewType';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class JwtAdapter {
   constructor(
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private configService: ConfigService,
+    private jwtService: JwtService,
   ) {}
 
   async createRefreshToken(

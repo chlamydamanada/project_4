@@ -2,6 +2,7 @@ import { NewPassRecoveryDtoType } from '../types/newPassRecoveryDtoType';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../superAdmin/users/repositories/users.repository';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BcryptAdapter } from '../../../../../adapters/bcryptAdapter';
 
 export class ChangePasswordCommand {
   constructor(public newPassRecoveryDto: NewPassRecoveryDtoType) {}
@@ -10,7 +11,10 @@ export class ChangePasswordCommand {
 export class ChangePasswordUseCase
   implements ICommandHandler<ChangePasswordCommand>
 {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly bcryptAdapter: BcryptAdapter,
+  ) {}
   async execute(command: ChangePasswordCommand): Promise<void> {
     const user = await this.usersRepository.findUserByPasswordRecoveryCode(
       command.newPassRecoveryDto.recoveryCode,
@@ -20,7 +24,10 @@ export class ChangePasswordUseCase
       throw new BadRequestException([
         { message: 'Recovery code is expired', field: 'recoveryCode' },
       ]);
-    await user.generatePasswordHash(command.newPassRecoveryDto.newPassword);
+    const passwordHash = await this.bcryptAdapter.generatePasswordHash(
+      command.newPassRecoveryDto.newPassword,
+    );
+    await user.changePasswordHash(passwordHash);
     await this.usersRepository.saveUser(user);
     return;
   }

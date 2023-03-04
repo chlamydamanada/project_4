@@ -1,20 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserEntity, UserModel } from '../domain/user.schema';
-import { Model, Types } from 'mongoose';
+import { User, UserEntity, UserModelType } from '../domain/user.schema';
+import { Types } from 'mongoose';
+import { UserCreatingDtoType } from '../usersTypes/userCreatingDtoType';
 
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectModel(User.name) private userModel: UserModel) {}
+  constructor(@InjectModel(User.name) private userModel: UserModelType) {}
 
-  getUserEntity() {
+  getUserEntity(
+    login: string,
+    email: string,
+    passwordHash: string,
+  ): UserEntity {
     const userEntity = this.userModel.createUser({
-      login: 'string',
-      email: 'fhfh',
-      password: 'gjgjg',
+      login,
+      email,
+      passwordHash,
     });
-    userEntity;
-    return new this.userModel();
+    return userEntity;
+    //return new this.userModel();
   }
 
   async saveUser(user: UserEntity): Promise<string> {
@@ -37,13 +42,16 @@ export class UsersRepository {
     return;
   }
 
-  /*async isUserExist({
-    login,
-    email,
-  }: {
-    login?: string;
-    email?: string;
-  }): /*Promise<{ isExist: boolean; errorField: 'email' | 'login' }>*/
+  async isUserExist(
+    login: string,
+    email: string,
+  ): Promise<{ isExist: boolean; field: 'email' | 'login' | null }> {
+    const userByLogin = await this.userModel.findOne({ login });
+    if (userByLogin) return { isExist: true, field: 'login' };
+    const userByEmail = await this.userModel.findOne({ email });
+    if (userByEmail) return { isExist: true, field: 'email' };
+    return { isExist: false, field: null };
+  }
 
   async findUserByLoginOrEmail(
     loginOrEmail: string,

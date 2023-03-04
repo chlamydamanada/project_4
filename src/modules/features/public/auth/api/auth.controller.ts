@@ -55,16 +55,15 @@ export class AuthController {
     @Headers('user-agent') deviceTitle: string,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const accessToken = await this.jwtAdapter.createAccessToken(userInfo);
-    const refreshToken = await this.commandBus.execute(
+    const tokens = await this.commandBus.execute(
       new CreateRTMetaCommand(userInfo, ip, deviceTitle),
     );
-    console.log('refreshToken:', refreshToken);
-    response.cookie('refreshToken', refreshToken, {
+    console.log('refreshToken:', tokens.refreshToken);
+    response.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: true,
     });
-    return accessToken;
+    return tokens.accessToken;
   }
 
   @UseGuards(AccessTokenGuard)
@@ -111,11 +110,7 @@ export class AuthController {
     @Headers('user-agent') deviceTitle: string,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AccessTokenViewType> {
-    const accessToken = await this.jwtAdapter.createAccessToken({
-      id: userInfo.id,
-      login: userInfo.login,
-    });
-    const refreshToken = await this.commandBus.execute(
+    const tokens = await this.commandBus.execute(
       new UpdateRTMetaCommand(
         {
           id: userInfo.id,
@@ -126,12 +121,12 @@ export class AuthController {
         deviceTitle,
       ),
     );
-    console.log(refreshToken);
-    response.cookie('refreshToken', refreshToken, {
+    console.log(tokens.refreshToken);
+    response.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: true,
     });
-    return accessToken;
+    return tokens.accessToken;
   }
 
   @Post('logout')

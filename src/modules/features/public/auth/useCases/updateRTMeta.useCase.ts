@@ -1,10 +1,10 @@
 import { UserInfoType } from '../types/userInfoType';
-import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ConfigService } from '@nestjs/config';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DevicesRepository } from '../../devices/repositories/device.repository';
 import { UpdateDeviceDtoType } from '../../devices/devicesTypes/updateDeviceDtoType';
 import { NotFoundException } from '@nestjs/common';
 import { JwtAdapter } from '../../../../../adapters/jwtAdapter';
+import { TokensType } from '../types/tokensType';
 
 export class UpdateRTMetaCommand {
   constructor(
@@ -22,14 +22,18 @@ export class UpdateRTMetaUseCase
     private readonly jwtAdapter: JwtAdapter,
     private readonly devicesRepository: DevicesRepository,
   ) {}
-  async execute(command: UpdateRTMetaCommand): Promise<string> {
+  async execute(command: UpdateRTMetaCommand): Promise<TokensType> {
     // create refresh token
-    const token = await this.jwtAdapter.createRefreshToken(
+    const refreshToken = await this.jwtAdapter.createRefreshToken(
       command.userInfo,
       command.deviceId,
     );
+    // create access token
+    const accessToken = await this.jwtAdapter.createAccessToken(
+      command.userInfo,
+    );
     // decode token to take iat and exp
-    const tokenInfo: any = this.jwtAdapter.decodeToken(token);
+    const tokenInfo: any = this.jwtAdapter.decodeToken(refreshToken);
     // update device session
     await this.updateDevice({
       deviceId: tokenInfo.deviceId,
@@ -38,7 +42,7 @@ export class UpdateRTMetaUseCase
       lastActiveDate: tokenInfo.iat!,
       expirationDate: tokenInfo.exp!,
     });
-    return token;
+    return { refreshToken, accessToken };
   }
   private async updateDevice(deviceDto: UpdateDeviceDtoType): Promise<void> {
     const device = await this.devicesRepository.findDeviceByDeviceId(

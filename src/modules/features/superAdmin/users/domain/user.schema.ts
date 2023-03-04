@@ -5,17 +5,37 @@ import { add } from 'date-fns';
 import bcrypt from 'bcrypt';
 import { emailConfirmationType } from '../usersTypes/emailConfirmationType';
 import { PasswordRecoveryInfoType } from '../usersTypes/passwordRecoveryInfoType';
-import { UserDtoType } from '../usersTypes/userInputModelType';
 import { BanInfoType } from '../usersTypes/banInfoType';
 import { UpdatingBanStatusDtoType } from '../usersTypes/updatingBanStatusDtoType';
+import { UserCreatingDtoType } from '../usersTypes/userCreatingDtoType';
 
 export type UserEntity = HydratedDocument<User>;
-export type UserModel = Model<UserEntity> & typeof statics;
+export type UserModelType = Model<UserEntity> & typeof statics;
 
 const statics = {
-  createUser(dto: UserDtoType): UserEntity {
+  createUser(userDto: UserCreatingDtoType): UserEntity {
     const user = {
-      login: dto.login,
+      login: userDto.login,
+      email: userDto.email,
+      passwordHash: userDto.passwordHash,
+      createdAt: new Date().toISOString(),
+      emailConfirmation: {
+        confirmationCode: uuidv4(),
+        expirationDate: add(new Date(), {
+          hours: 1,
+          minutes: 30,
+        }),
+        isConfirmed: false,
+      },
+      passwordRecoveryInfo: {
+        recoveryCode: null,
+        expirationDate: null,
+      },
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     };
 
     return new this(user);
@@ -64,24 +84,6 @@ export class User {
   )
   banInfo: BanInfoType;
 
-  async createUser(userInputModel: UserDtoType) {
-    this.login = userInputModel.login;
-    this.email = userInputModel.email;
-    this.createdAt = new Date().toISOString();
-    this.emailConfirmation.confirmationCode = uuidv4();
-    this.emailConfirmation.expirationDate = add(new Date(), {
-      hours: 1,
-      minutes: 30,
-    });
-    this.emailConfirmation.isConfirmed = false;
-    this.passwordRecoveryInfo.recoveryCode = null;
-    this.passwordRecoveryInfo.expirationDate = null;
-    this.banInfo.isBanned = false;
-    this.banInfo.banDate = null;
-    this.banInfo.banReason = null;
-    await this.generatePasswordHash(userInputModel.password);
-  }
-
   banOrUnbanUser(banDto: UpdatingBanStatusDtoType) {
     if (banDto.isBanned) {
       this.banInfo.isBanned = true;
@@ -93,19 +95,10 @@ export class User {
       this.banInfo.banReason = null;
     }
   }
-  //delete
-  async generatePasswordHash(password: string) {
-    const salt = await bcrypt.genSalt();
-    const hash = await bcrypt.hash(password, salt);
-    this.passwordHash = hash;
-  }
-  //delete
-  async checkPassword(password) {
-    const salt = this.passwordHash.slice(0, 29);
-    const checkedHash = await bcrypt.hash(password, salt);
-    return checkedHash === this.passwordHash;
-  }
 
+  async changePasswordHash(passwordHash: string) {
+    this.passwordHash = passwordHash;
+  }
   confirmEmail() {
     this.emailConfirmation.isConfirmed = true;
   }
@@ -129,9 +122,7 @@ export class User {
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.methods = {
-  generatePasswordHash: User.prototype.generatePasswordHash,
-  createUser: User.prototype.createUser,
-  checkPassword: User.prototype.checkPassword,
+  changePasswordHash: User.prototype.changePasswordHash,
   confirmEmail: User.prototype.confirmEmail,
   generateNewConfirmationCode: User.prototype.generateNewConfirmationCode,
   generatePasswordRecoveryCode: User.prototype.generatePasswordRecoveryCode,

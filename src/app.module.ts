@@ -64,6 +64,7 @@ import { UpdateRTMetaUseCase } from './modules/features/public/auth/useCases/upd
 import { CreateUserUseCase } from './modules/features/superAdmin/users/useCases/createUser.useCase';
 import { UserRegistrationUseCase } from './modules/features/public/auth/useCases/userRegistration.useCase';
 import { JwtAdapter } from './adapters/jwtAdapter';
+import { BcryptAdapter } from './adapters/bcryptAdapter';
 
 const services = [AppService];
 const repositories = [
@@ -114,7 +115,7 @@ const strategies = [
 ];
 const validators = [IsBlogExistValidator];
 
-const adapters = [JwtAdapter];
+const adapters = [JwtAdapter, BcryptAdapter];
 
 @Module({
   imports: [

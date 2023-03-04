@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateDeviceDtoType } from '../../devices/devicesTypes/createDeviceDtoType';
 import { DevicesRepository } from '../../devices/repositories/device.repository';
 import { JwtAdapter } from '../../../../../adapters/jwtAdapter';
+import { TokensType } from '../types/tokensType';
 
 export class CreateRTMetaCommand {
   constructor(
@@ -20,15 +21,19 @@ export class CreateRTMetaUseCase
     private readonly jwtAdapter: JwtAdapter,
     private readonly devicesRepository: DevicesRepository,
   ) {}
-  async execute(command: CreateRTMetaCommand): Promise<string> {
+  async execute(command: CreateRTMetaCommand): Promise<TokensType> {
     const deviceId = uuidv4();
     //  create refresh token
-    const token = await this.jwtAdapter.createRefreshToken(
+    const refreshToken = await this.jwtAdapter.createRefreshToken(
       command.userInfo,
       deviceId,
     );
+    // create access token
+    const accessToken = await this.jwtAdapter.createAccessToken(
+      command.userInfo,
+    );
     // decode token to take iat and exp
-    const tokenInfo: any = this.jwtAdapter.decodeToken(token);
+    const tokenInfo: any = this.jwtAdapter.decodeToken(refreshToken);
     // create device session
     await this.createDevice({
       deviceId: tokenInfo.deviceId,
@@ -38,7 +43,7 @@ export class CreateRTMetaUseCase
       lastActiveDate: tokenInfo.iat!,
       expirationDate: tokenInfo.exp!,
     });
-    return token;
+    return { refreshToken, accessToken };
   }
 
   private async createDevice(deviceDto: CreateDeviceDtoType): Promise<string> {
