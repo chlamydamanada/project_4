@@ -69,6 +69,7 @@ import { BanStatusModel } from './modules/features/blogger/banStatus/domain/banS
 import { BloggerQueryRepository } from './modules/features/blogger/bloggerQueryRepository';
 import { BanOrUnbanBlogUseCase } from './modules/features/superAdmin/blogs/useCases/banOrUnbanBlog.useCase';
 import { BanOrUnbanUserByBloggerUseCase } from './modules/features/blogger/users/useCases/banOrUnbanUserByBlogger.useCase';
+import { UsersForBloggerRepository } from './modules/features/blogger/users/repositories/usersForBlogger.repositoryMongo';
 
 const services = [AppService];
 const repositories = [
@@ -84,6 +85,7 @@ const repositories = [
   UsersRepository,
   DeleteAllDataRepository,
   BloggerQueryRepository,
+  UsersForBloggerRepository,
 ];
 const useCases = [
   DeleteAllDataUseCase,
