@@ -66,6 +66,7 @@ import { UserRegistrationUseCase } from './modules/features/public/auth/useCases
 import { JwtAdapter } from './adapters/jwtAdapter';
 import { BcryptAdapter } from './adapters/bcryptAdapter';
 import { BanStatusModel } from './modules/features/blogger/banStatus/domain/banStatus.schema';
+import { BloggerQueryRepository } from './modules/features/blogger/bloggerQueryRepository';
 
 const services = [AppService];
 const repositories = [
@@ -80,6 +81,7 @@ const repositories = [
   UsersQueryRepository,
   UsersRepository,
   DeleteAllDataRepository,
+  BloggerQueryRepository,
 ];
 const useCases = [
   DeleteAllDataUseCase,
