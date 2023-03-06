@@ -30,17 +30,24 @@ import { DeleteBlogCommand } from './blogs/useCases/deleteBlog.useCase';
 import { CreatePostCommand } from './posts/useCases/createPost.useCase';
 import { UpdatePostCommand } from './posts/useCases/updatePost.useCase';
 import { DeletePostCommand } from './posts/useCases/deletePost.useCase';
+import { BloggerQueryRepository } from './bloggerQueryRepository';
+import { CommentQueryPipe } from '../public/comments/api/pipes/commentQueryPipe';
+import { commentQueryType } from '../public/comments/commentsTypes/commentQweryType';
+import { CommentsViewForBloggerType } from './comments/types/commentsViewForBloggerType';
+import { BanStatusByBloggerPipe } from './users/api/pipes/banStatusByBloggerPipe';
+import { BanOrUnbanUserByBloggerCommand } from './users/useCases/banOrUnbanUserByBlogger.useCase';
 
 @UseGuards(AccessTokenGuard)
-@Controller('blogger/blogs')
+@Controller('blogger')
 export class BloggerController {
   constructor(
     private readonly blogsQweryRepository: BlogsQweryRepository,
     private readonly postsQweryRepository: PostsQweryRepository,
+    private readonly bloggerQueryRepository: BloggerQueryRepository,
     private commandBus: CommandBus,
   ) {}
 
-  @Get()
+  @Get('blogs')
   async getAllOwnerBlogs(
     @CurrentUserId() bloggerId: string,
     @Query() query: BlogQweryPipe,
@@ -53,7 +60,21 @@ export class BloggerController {
     return blogs;
   }
 
-  @Post()
+  @Get('blogs/comments')
+  async getAllCommentsForAllPost(
+    @CurrentUserId() bloggerId: string,
+    @Query() query: CommentQueryPipe,
+  ): Promise<CommentsViewForBloggerType> {
+    const comments =
+      await this.bloggerQueryRepository.findAllCommentsForAllPosts(
+        bloggerId,
+        query as commentQueryType,
+      );
+    if (!comments) throw new NotFoundException('You have`t any comments');
+    return comments;
+  }
+
+  @Post('blogs')
   async createBlog(
     @Body() blogInputModel: blogInputModelPipe,
     @CurrentUserInfo() userInfo: UserInfoType,
@@ -69,7 +90,7 @@ export class BloggerController {
     return newBlog!;
   }
 
-  @Post(':blogId/posts')
+  @Post('blogs/:blogId/posts')
   async createPostByBlogId(
     @Param('blogId') blogId: string,
     @Body() postInputModel: postInputModelIdPipe,
@@ -86,7 +107,7 @@ export class BloggerController {
     return newPost!;
   }
 
-  @Put(':id')
+  @Put('blogs/:id')
   @HttpCode(204)
   async updateBlog(
     @Param('id') blogId: string,
@@ -103,7 +124,7 @@ export class BloggerController {
     return;
   }
 
-  @Put(':blogId/posts/:postId')
+  @Put('blogs/:blogId/posts/:postId')
   @HttpCode(204)
   async updatePost(
     @Param('blogId') blogId: string,
@@ -122,7 +143,7 @@ export class BloggerController {
     return;
   }
 
-  @Delete(':id')
+  @Delete('blogs/:id')
   @HttpCode(204)
   async deleteBlogByBlogId(
     @Param('id') blogId: string,
@@ -132,7 +153,7 @@ export class BloggerController {
     return;
   }
 
-  @Delete(':blogId/posts/:postId')
+  @Delete('blogs/:blogId/posts/:postId')
   @HttpCode(204)
   async deletePostByPostId(
     @Param('blogId') blogId: string,
@@ -141,6 +162,23 @@ export class BloggerController {
   ): Promise<string | void> {
     await this.commandBus.execute(
       new DeletePostCommand({ postId, blogId, bloggerId }),
+    );
+    return;
+  }
+
+  @Put('users/:userId/ban')
+  @HttpCode(204)
+  async banOrUnbanUser(
+    @Param('userId') userId: string,
+    @CurrentUserId() bloggerId: string,
+    @Body() banUserInputDto: BanStatusByBloggerPipe,
+  ) {
+    await this.commandBus.execute(
+      new BanOrUnbanUserByBloggerCommand({
+        userId,
+        bloggerId,
+        ...banUserInputDto,
+      }),
     );
     return;
   }

@@ -20,7 +20,7 @@ export class PostsQweryRepository {
   ): Promise<postsViewType> {
     const totalCount = await this.postModel.count({});
     const posts = await this.postModel
-      .find({ isOwnerBanned: false })
+      .find({ isOwnerBanned: false, isBlogBanned: false })
       .sort({ [query.sortBy]: query.sortDirection })
       .skip((query.pageNumber - 1) * query.pageSize)
       .limit(query.pageSize);
@@ -43,7 +43,7 @@ export class PostsQweryRepository {
   ): Promise<postsViewType | null> {
     const totalCount = await this.postModel.count({ blogId: blogId });
     const posts = await this.postModel
-      .find({ blogId: blogId, isOwnerBanned: false })
+      .find({ blogId: blogId, isOwnerBanned: false, isBlogBanned: false })
       .sort({ [query.sortBy]: query.sortDirection })
       .skip((query.pageNumber - 1) * query.pageSize)
       .limit(query.pageSize);
@@ -67,6 +67,7 @@ export class PostsQweryRepository {
     const post = await this.postModel.findOne({
       _id: new Types.ObjectId(postId),
       isOwnerBanned: false,
+      isBlogBanned: false,
     });
     if (!post) return undefined;
     const result = await this.makeViewPost(post, userId);

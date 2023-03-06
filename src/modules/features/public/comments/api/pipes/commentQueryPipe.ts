@@ -1,7 +1,7 @@
 import { IsNumber, IsOptional } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
-export class CommentQweryPipe {
+export class CommentQueryPipe {
   @IsOptional()
   @IsNumber()
   @Type(() => Number)

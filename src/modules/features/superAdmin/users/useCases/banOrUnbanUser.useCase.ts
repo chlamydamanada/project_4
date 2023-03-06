@@ -1,4 +1,4 @@
-import { UpdatingBanStatusDtoType } from '../usersTypes/updatingBanStatusDtoType';
+import { UserBanStatusDtoType } from '../usersTypes/userBanStatusDtoType';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../repositories/users.repository';
 import { DevicesRepository } from '../../../public/devices/repositories/device.repository';
@@ -8,7 +8,7 @@ import { PostsRepository } from '../../../blogger/posts/repositories/posts.repos
 import { NotFoundException } from '@nestjs/common';
 
 export class BanOrUnbanUserCommand {
-  constructor(public banStatusDto: UpdatingBanStatusDtoType) {}
+  constructor(public banStatusDto: UserBanStatusDtoType) {}
 }
 
 @CommandHandler(BanOrUnbanUserCommand)
@@ -31,10 +31,10 @@ export class BanOrUnbanUserUseCase
     user.banOrUnbanUser(command.banStatusDto);
     await this.usersRepository.saveUser(user);
     // ban or unban user`s blogs
-    await this.blogsRepository.banOrUnbanBlogOwner(
-      command.banStatusDto.userId,
-      command.banStatusDto.isBanned,
-    );
+    //await this.blogsRepository.banOrUnbanBlogOwner(
+    // command.banStatusDto.userId,
+    // command.banStatusDto.isBanned,
+    //);
     // ban or unban user`s  posts and likes
     await this.postsRepository.banOrUnbanPostOwner(
       command.banStatusDto.userId,

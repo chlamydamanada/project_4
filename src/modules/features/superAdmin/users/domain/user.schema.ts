@@ -2,11 +2,9 @@ import { HydratedDocument, Model } from 'mongoose';
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
-import bcrypt from 'bcrypt';
 import { emailConfirmationType } from '../usersTypes/emailConfirmationType';
 import { PasswordRecoveryInfoType } from '../usersTypes/passwordRecoveryInfoType';
 import { BanInfoType } from '../usersTypes/banInfoType';
-import { UpdatingBanStatusDtoType } from '../usersTypes/updatingBanStatusDtoType';
 import { UserCreatingDtoType } from '../usersTypes/userCreatingDtoType';
 
 export type UserEntity = HydratedDocument<User>;
@@ -84,7 +82,7 @@ export class User {
   )
   banInfo: BanInfoType;
 
-  banOrUnbanUser(banDto: UpdatingBanStatusDtoType) {
+  banOrUnbanUser(banDto) {
     if (banDto.isBanned) {
       this.banInfo.isBanned = true;
       this.banInfo.banDate = new Date().toISOString();

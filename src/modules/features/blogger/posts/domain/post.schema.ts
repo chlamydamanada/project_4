@@ -22,6 +22,9 @@ export class Post {
   blogName: string;
 
   @Prop({ required: true })
+  isBlogBanned: boolean;
+
+  @Prop({ required: true })
   createdAt: string;
 
   @Prop({ required: true })
@@ -39,6 +42,7 @@ export class Post {
     this.blogName = blogName;
     this.createdAt = new Date().toISOString();
     this.isOwnerBanned = false;
+    this.isBlogBanned = false;
   }
 
   updatePost(postDto) {
@@ -53,4 +57,5 @@ PostSchema.methods = {
   createPost: Post.prototype.createPost,
   updatePost: Post.prototype.updatePost,
 };
+
 export const PostModel = { name: Post.name, schema: PostSchema };

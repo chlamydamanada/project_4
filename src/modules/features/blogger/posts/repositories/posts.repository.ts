@@ -80,4 +80,14 @@ export class PostsRepository {
     );
     return;
   }
+
+  async banOrUnbanPostsForBlog(
+    blogId: string,
+    banStatus: boolean,
+  ): Promise<void> {
+    await this.postModel.updateMany(
+      { blogId },
+      { $set: { isBlogBanned: banStatus } },
+    );
+  }
 }

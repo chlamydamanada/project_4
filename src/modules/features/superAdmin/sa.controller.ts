@@ -20,12 +20,14 @@ import { blogQueryType } from '../public/blogs/types/blogsQweryType';
 import { UserQweryPipe } from './users/api/pipes/userQweryPipe';
 import { UsersViewType } from './users/usersTypes/usersViewType';
 import { userInputModelPipe } from './users/api/pipes/userInputDtoPipe';
-import { BanStatusInputModelPipe } from './users/usersTypes/banStatusInputModelPipe';
+import { BanStatusInputModelPipe } from './users/api/pipes/banStatusInputModelPipe';
 import { CommandBus } from '@nestjs/cqrs';
 import { BlogBindToUserCommand } from './blogs/useCases/blogBindToUser.useCase';
 import { DeleteUserCommand } from './users/useCases/deleteUser.useCase';
 import { BanOrUnbanUserCommand } from './users/useCases/banOrUnbanUser.useCase';
 import { CreateUserCommand } from './users/useCases/createUser.useCase';
+import { BanOrUnbanBlogPipe } from './blogs/api/pipes/banOrUnbanBlog.pipe';
+import { BanOrUnbanBlogCommand } from './blogs/useCases/banOrUnbanBlog.useCase';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa')
@@ -89,6 +91,18 @@ export class SaController {
   ) {
     await this.commandBus.execute(
       new BanOrUnbanUserCommand({ userId, ...banStatusInputModel }),
+    );
+    return;
+  }
+
+  @Put('blogs/:id/ban')
+  @HttpCode(204)
+  async banOrUnbanBlog(
+    @Param('id') blogId: string,
+    @Body() banStatusInputModel: BanOrUnbanBlogPipe,
+  ) {
+    await this.commandBus.execute(
+      new BanOrUnbanBlogCommand({ blogId, ...banStatusInputModel }),
     );
     return;
   }

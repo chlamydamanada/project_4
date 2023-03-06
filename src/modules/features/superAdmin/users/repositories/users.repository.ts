@@ -1,12 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserEntity, UserModelType } from '../domain/user.schema';
-import { Types } from 'mongoose';
-import { UserCreatingDtoType } from '../usersTypes/userCreatingDtoType';
+import { Model, Types } from 'mongoose';
+import {
+  BanStatus,
+  BanStatusEntity,
+} from '../../../blogger/banStatus/domain/banStatus.schema';
 
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectModel(User.name) private userModel: UserModelType) {}
+  constructor(
+    @InjectModel(User.name) private userModel: UserModelType,
+    @InjectModel(BanStatus.name) private banStatusModel: Model<BanStatusEntity>,
+  ) {}
 
   getUserEntity(
     login: string,
@@ -81,5 +87,14 @@ export class UsersRepository {
     });
     if (!user) return undefined;
     return user;
+  }
+
+  async isUserBannedForBlog(userId: string, blogId: string): Promise<boolean> {
+    const status = await this.banStatusModel.findOne({
+      blogId,
+      'userInfo.userId': userId,
+    });
+    if (!status) return false;
+    return true;
   }
 }

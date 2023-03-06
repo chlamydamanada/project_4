@@ -6,6 +6,9 @@ export type BlogEntity = HydratedDocument<Blog>;
 
 @Schema()
 export class Blog {
+  //@Prop({ type: SchemaTypes.ObjectId })
+  //_id: ObjectId;
+
   @Prop({ required: true })
   ownerId: string;
 
@@ -30,6 +33,9 @@ export class Blog {
   @Prop({ required: true })
   isOwnerBanned: boolean;
 
+  @Prop({ required: true })
+  isBanned: boolean;
+
   createBlog(blogDto: creatingBlogDtoType) {
     this.ownerId = blogDto.bloggerId;
     this.ownerLogin = blogDto.bloggerLogin;
@@ -39,6 +45,7 @@ export class Blog {
     this.createdAt = new Date().toISOString();
     this.isMembership = false;
     this.isOwnerBanned = false;
+    this.isBanned = false;
   }
   updateBlog(blogDto) {
     this.name = blogDto.name;
@@ -50,6 +57,10 @@ export class Blog {
     this.ownerId = ownerId;
     this.ownerLogin = ownerLogin;
   }
+
+  banOrUnbanBlog(banStatus: boolean) {
+    this.isBanned = banStatus;
+  }
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);
@@ -57,5 +68,6 @@ BlogSchema.methods = {
   createBlog: Blog.prototype.createBlog,
   updateBlog: Blog.prototype.updateBlog,
   updateOwnerId: Blog.prototype.updateOwnerId,
+  banOrUnbanBlog: Blog.prototype.banOrUnbanBlog,
 };
 export const BlogModel = { name: Blog.name, schema: BlogSchema };

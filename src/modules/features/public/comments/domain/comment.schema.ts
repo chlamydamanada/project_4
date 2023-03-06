@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { commentInputDtoType } from '../commentsTypes/commentInputDtoType';
 
 export type CommentEntity = HydratedDocument<Comment>;
+
 @Schema()
 export class Comment {
   @Prop({ required: true })

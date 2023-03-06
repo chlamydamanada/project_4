@@ -24,7 +24,7 @@ import { StatusPipe } from '../../status/api/pipes/statusPipe';
 import { CommentsViewType } from '../../comments/commentsTypes/commentsViewType';
 import { postViewType } from '../types/postViewType';
 import { postQueryType } from '../types/postsQweryType';
-import { CommentQweryPipe } from '../../comments/api/pipes/commentQweryPipe';
+import { CommentQueryPipe } from '../../comments/api/pipes/commentQueryPipe';
 import { CurrentUserInfo } from '../../../../../helpers/decorators/currentUserIdAndLogin';
 import { UserInfoType } from '../../auth/types/userInfoType';
 import { CommandBus } from '@nestjs/cqrs';
@@ -71,7 +71,7 @@ export class PostsController {
   @UseGuards(ExtractUserIdFromAT)
   async getAllCommentsByPostId(
     @Param('postId') postId: string,
-    @Query() query: CommentQweryPipe,
+    @Query() query: CommentQueryPipe,
     @CurrentUserId() userId: string | null,
   ): Promise<CommentsViewType | string> {
     const post = await this.postsQweryRepository.getPostByPostId(postId);

@@ -65,6 +65,7 @@ import { CreateUserUseCase } from './modules/features/superAdmin/users/useCases/
 import { UserRegistrationUseCase } from './modules/features/public/auth/useCases/userRegistration.useCase';
 import { JwtAdapter } from './adapters/jwtAdapter';
 import { BcryptAdapter } from './adapters/bcryptAdapter';
+import { BanStatusModel } from './modules/features/blogger/banStatus/domain/banStatus.schema';
 
 const services = [AppService];
 const repositories = [
@@ -128,6 +129,7 @@ const adapters = [JwtAdapter, BcryptAdapter];
       CommentModel,
       DeviceModel,
       StatusModel,
+      BanStatusModel,
     ]),
     PassportModule,
     MailModule, // 📧
