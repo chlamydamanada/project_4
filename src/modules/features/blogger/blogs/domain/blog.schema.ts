@@ -36,6 +36,9 @@ export class Blog {
   @Prop({ required: true })
   isBanned: boolean;
 
+  @Prop({ type: String })
+  banDate: string | null;
+
   createBlog(blogDto: creatingBlogDtoType) {
     this.ownerId = blogDto.bloggerId;
     this.ownerLogin = blogDto.bloggerLogin;
@@ -46,6 +49,7 @@ export class Blog {
     this.isMembership = false;
     this.isOwnerBanned = false;
     this.isBanned = false;
+    this.banDate = null;
   }
   updateBlog(blogDto) {
     this.name = blogDto.name;
@@ -59,7 +63,13 @@ export class Blog {
   }
 
   banOrUnbanBlog(banStatus: boolean) {
-    this.isBanned = banStatus;
+    if (banStatus) {
+      this.banDate = new Date().toISOString();
+      this.isBanned = true;
+    } else {
+      this.isBanned = false;
+      this.banDate = null;
+    }
   }
 }
 

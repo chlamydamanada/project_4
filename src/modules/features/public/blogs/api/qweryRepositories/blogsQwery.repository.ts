@@ -94,6 +94,10 @@ export class BlogsQweryRepository {
         userId: b.ownerId,
         userLogin: b.ownerLogin,
       },
+      banInfo: {
+        isBanned: b.isBanned,
+        banDate: b.banDate,
+      },
     }));
     return {
       pagesCount: Math.ceil(dbValues.totalCount / query.pageSize),

@@ -67,6 +67,8 @@ import { JwtAdapter } from './adapters/jwtAdapter';
 import { BcryptAdapter } from './adapters/bcryptAdapter';
 import { BanStatusModel } from './modules/features/blogger/banStatus/domain/banStatus.schema';
 import { BloggerQueryRepository } from './modules/features/blogger/bloggerQueryRepository';
+import { BanOrUnbanBlogUseCase } from './modules/features/superAdmin/blogs/useCases/banOrUnbanBlog.useCase';
+import { BanOrUnbanUserByBloggerUseCase } from './modules/features/blogger/users/useCases/banOrUnbanUserByBlogger.useCase';
 
 const services = [AppService];
 const repositories = [
@@ -110,6 +112,8 @@ const useCases = [
   UpdateRTMetaUseCase,
   CreateUserUseCase,
   UserRegistrationUseCase,
+  BanOrUnbanBlogUseCase,
+  BanOrUnbanUserByBloggerUseCase,
 ];
 const strategies = [
   PasswordStrategy,
