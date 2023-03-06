@@ -11,7 +11,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsQweryRepository } from '../public/blogs/api/qweryRepositories/blogsQwery.repository';
+import { BlogsQueryRepository } from '../public/blogs/api/qweryRepositories/blogs-query-repository.service';
 import { AccessTokenGuard } from '../public/auth/guards/accessTokenAuth.guard';
 import { CurrentUserId } from '../../../helpers/decorators/currentUserId.decorator';
 import { BlogQweryPipe } from '../public/blogs/api/pipes/blogQweryPipe';
@@ -20,7 +20,7 @@ import { blogInputModelPipe } from './blogs/pipes/blogInputDtoPipe';
 import { blogViewType } from '../public/blogs/types/blogViewType';
 import { postInputModelIdPipe } from './posts/pipes/postInputDtoPipe';
 import { postViewType } from '../public/posts/types/postViewType';
-import { PostsQweryRepository } from '../public/posts/api/qweryRepositories/postsQwery.repository';
+import { PostsQueryRepository } from '../public/posts/api/qweryRepositories/posts-query-repository.service';
 import { CurrentUserInfo } from '../../../helpers/decorators/currentUserIdAndLogin';
 import { UserInfoType } from '../public/auth/types/userInfoType';
 import { CommandBus } from '@nestjs/cqrs';
@@ -36,13 +36,15 @@ import { commentQueryType } from '../public/comments/commentsTypes/commentQweryT
 import { CommentsViewForBloggerType } from './comments/types/commentsViewForBloggerType';
 import { BanStatusByBloggerPipe } from './users/api/pipes/banStatusByBloggerPipe';
 import { BanOrUnbanUserByBloggerCommand } from './users/useCases/banOrUnbanUserByBlogger.useCase';
+import { BannedUserQueryDtoPipe } from './users/api/pipes/bannedUserQueryDtoPipe';
+import { BannedUsersForBlogType } from './users/types/bannedUsersForBlogType';
 
 @UseGuards(AccessTokenGuard)
 @Controller('blogger')
 export class BloggerController {
   constructor(
-    private readonly blogsQweryRepository: BlogsQweryRepository,
-    private readonly postsQweryRepository: PostsQweryRepository,
+    private readonly blogsQueryRepository: BlogsQueryRepository,
+    private readonly postsQueryRepository: PostsQueryRepository,
     private readonly bloggerQueryRepository: BloggerQueryRepository,
     private commandBus: CommandBus,
   ) {}
@@ -52,7 +54,7 @@ export class BloggerController {
     @CurrentUserId() bloggerId: string,
     @Query() query: BlogQweryPipe,
   ) {
-    const blogs = await this.blogsQweryRepository.getAllBlogs(
+    const blogs = await this.blogsQueryRepository.getAllBlogs(
       query as blogQueryType,
       bloggerId,
     );
@@ -86,7 +88,7 @@ export class BloggerController {
         bloggerLogin: userInfo.login,
       }),
     );
-    const newBlog = await this.blogsQweryRepository.getBlogByBlogId(newBlogId);
+    const newBlog = await this.blogsQueryRepository.getBlogByBlogId(newBlogId);
     return newBlog!;
   }
 
@@ -103,7 +105,7 @@ export class BloggerController {
         bloggerId,
       }),
     );
-    const newPost = await this.postsQweryRepository.getPostByPostId(newPostId);
+    const newPost = await this.postsQueryRepository.getPostByPostId(newPostId);
     return newPost!;
   }
 
@@ -181,5 +183,18 @@ export class BloggerController {
       }),
     );
     return;
+  }
+
+  @Get('users/blog/:blogId')
+  async getBannedUsersForBlog(
+    @Param('blogId') blogId: string,
+    @Query() query: BannedUserQueryDtoPipe,
+  ): Promise<BannedUsersForBlogType> {
+    const bannedUsers = await this.bloggerQueryRepository.findBannedUserForBlog(
+      blogId,
+      query,
+    );
+    if (!bannedUsers) throw new NotFoundException('You haven`t banned users');
+    return bannedUsers;
   }
 }

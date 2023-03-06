@@ -11,7 +11,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsQweryRepository } from '../public/blogs/api/qweryRepositories/blogsQwery.repository';
+import { BlogsQueryRepository } from '../public/blogs/api/qweryRepositories/blogs-query-repository.service';
 import { UsersQueryRepository } from './users/api/qweryRepositories/usersQwery.repository';
 import { BasicAuthGuard } from '../public/auth/guards/auth-guard';
 import { BlogQweryPipe } from '../public/blogs/api/pipes/blogQweryPipe';
@@ -33,7 +33,7 @@ import { BanOrUnbanBlogCommand } from './blogs/useCases/banOrUnbanBlog.useCase';
 @Controller('sa')
 export class SaController {
   constructor(
-    private readonly blogsQueryRepository: BlogsQweryRepository,
+    private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly usersQueryRepository: UsersQueryRepository,
     private commandBus: CommandBus,
   ) {}

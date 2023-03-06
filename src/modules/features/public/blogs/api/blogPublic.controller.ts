@@ -6,13 +6,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsQweryRepository } from './qweryRepositories/blogsQwery.repository';
+import { BlogsQueryRepository } from './qweryRepositories/blogs-query-repository.service';
 import { postsViewType } from '../../posts/types/postsViewType';
 import { postQueryType } from '../../posts/types/postsQweryType';
 import { BlogQweryPipe } from './pipes/blogQweryPipe';
 import { CurrentUserId } from '../../../../../helpers/decorators/currentUserId.decorator';
 import { ExtractUserIdFromAT } from '../../auth/guards/extractUserIdFromAT.guard';
-import { PostsQweryRepository } from '../../posts/api/qweryRepositories/postsQwery.repository';
+import { PostsQueryRepository } from '../../posts/api/qweryRepositories/posts-query-repository.service';
 import { PostQweryPipe } from '../../posts/api/pipes/postQweryPipe';
 import { blogViewType } from '../types/blogViewType';
 import { blogsViewType } from '../types/blogsViewType';
@@ -21,8 +21,8 @@ import { blogQueryType } from '../types/blogsQweryType';
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    private readonly blogsQweryRepository: BlogsQweryRepository,
-    private readonly postsQweryRepository: PostsQweryRepository,
+    private readonly blogsQweryRepository: BlogsQueryRepository,
+    private readonly postsQweryRepository: PostsQueryRepository,
   ) {}
 
   @Get()

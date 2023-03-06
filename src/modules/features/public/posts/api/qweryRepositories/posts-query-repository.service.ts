@@ -8,7 +8,7 @@ import { postQueryType } from '../../types/postsQweryType';
 import { postsViewType } from '../../types/postsViewType';
 
 @Injectable()
-export class PostsQweryRepository {
+export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name) private postModel: Model<PostEntity>,
     @InjectModel(Status.name) private statusModel: Model<StatusEntity>,

@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BlogsController } from './modules/features/public/blogs/api/blogPublic.controller';
-import { BlogsQweryRepository } from './modules/features/public/blogs/api/qweryRepositories/blogsQwery.repository';
+import { BlogsQueryRepository } from './modules/features/public/blogs/api/qweryRepositories/blogs-query-repository.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './modules/features/public/auth/api/auth.controller';
@@ -18,7 +18,7 @@ import { IsBlogExistValidator } from './helpers/validators/isBlogExistById.valid
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CommentsRepository } from './modules/features/public/comments/repositories/comments.repository';
 import { DevicesQweryRepository } from './modules/features/public/devices/api/qweryRepositories/deviceQwery.repository';
-import { PostsQweryRepository } from './modules/features/public/posts/api/qweryRepositories/postsQwery.repository';
+import { PostsQueryRepository } from './modules/features/public/posts/api/qweryRepositories/posts-query-repository.service';
 import { CommentsController } from './modules/features/public/comments/api/comment.controller';
 import { AllTestingDataController } from './modules/testingAllData/api/controllers/all-testing-data.controller';
 import { UsersQueryRepository } from './modules/features/superAdmin/users/api/qweryRepositories/usersQwery.repository';
@@ -73,9 +73,9 @@ import { UsersForBloggerRepository } from './modules/features/blogger/users/repo
 
 const services = [AppService];
 const repositories = [
-  BlogsQweryRepository,
+  BlogsQueryRepository,
   BlogsRepository,
-  PostsQweryRepository,
+  PostsQueryRepository,
   PostsRepository,
   CommentsQweryRepository,
   CommentsRepository,

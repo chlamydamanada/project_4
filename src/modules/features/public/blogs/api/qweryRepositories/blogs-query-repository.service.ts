@@ -9,7 +9,7 @@ import { FindAllBlogsByFiltersType } from '../../types/findAllBlogsByFiltersType
 import { BlogsSAType } from '../../../../blogger/blogs/types/blogsSAType';
 
 @Injectable()
-export class BlogsQweryRepository {
+export class BlogsQueryRepository {
   constructor(
     @InjectModel(Blog.name)
     private blogModel: Model<BlogEntity>,

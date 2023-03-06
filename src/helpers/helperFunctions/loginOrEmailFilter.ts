@@ -7,7 +7,6 @@ export const makeLoginOrEmailFilter = (
 ) => {
   const banFilter = makeBanStatusFilter(banStatus);
 
-  console.log('filter:', banFilter);
   if (login && email) {
     return {
       $and: [

@@ -11,8 +11,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AccessTokenGuard } from '../../auth/guards/accessTokenAuth.guard';
-import { BlogsQweryRepository } from '../../blogs/api/qweryRepositories/blogsQwery.repository';
-import { PostsQweryRepository } from './qweryRepositories/postsQwery.repository';
+import { BlogsQueryRepository } from '../../blogs/api/qweryRepositories/blogs-query-repository.service';
+import { PostsQueryRepository } from './qweryRepositories/posts-query-repository.service';
 import { ExtractUserIdFromAT } from '../../auth/guards/extractUserIdFromAT.guard';
 import { commentQueryType } from '../../comments/commentsTypes/commentQweryType';
 import { PostQweryPipe } from './pipes/postQweryPipe';
@@ -34,8 +34,8 @@ import { CreateCommentCommand } from '../useCases/createComment.useCase';
 @Controller('posts')
 export class PostsController {
   constructor(
-    private readonly blogsQweryRepository: BlogsQweryRepository,
-    private readonly postsQweryRepository: PostsQweryRepository,
+    private readonly blogsQweryRepository: BlogsQueryRepository,
+    private readonly postsQweryRepository: PostsQueryRepository,
     private readonly commentsQweryRepository: CommentsQweryRepository,
     private commandBus: CommandBus,
   ) {}

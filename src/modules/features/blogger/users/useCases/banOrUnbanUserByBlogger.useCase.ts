@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { BlogsRepository } from '../../blogs/repositories/blogs.repository';
 import { BanStatusByBloggerDtoType } from '../types/banStatusByBloggerDtoType';
 import { UsersForBloggerRepository } from '../repositories/usersForBlogger.repositoryMongo';
@@ -29,16 +29,17 @@ export class BanOrUnbanUserByBloggerUseCase
     if (!blog) throw new NotFoundException('Blog with this id does not exist');
     //check is blogger owner of this blog
     if (blog.ownerId !== command.banStatusDto.bloggerId)
-      throw new NotFoundException('Blog with this id does not exist');
+      throw new ForbiddenException('You can`t ban user for this blog');
+
     if (command.banStatusDto.isBanned) {
       const banStatus = await this.usersRepository.getBanStatusEntity();
-      banStatus.createBanStatus({
-        bloggerId: command.banStatusDto.bloggerId,
-        blogId: command.banStatusDto.blogId,
-        banReason: command.banStatusDto.banReason,
-        userId: command.banStatusDto.userId,
-        userLogin: user.login,
-      });
+      banStatus.createBanStatus(
+        command.banStatusDto.bloggerId,
+        command.banStatusDto.blogId,
+        command.banStatusDto.banReason,
+        command.banStatusDto.userId,
+        user.login,
+      );
       await this.usersRepository.banUserByBlogger(banStatus);
     }
     await this.usersRepository.unbanUserByBlogger(

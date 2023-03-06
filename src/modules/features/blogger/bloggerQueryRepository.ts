@@ -8,12 +8,18 @@ import {
 } from '../public/comments/domain/comment.schema';
 import { commentQueryType } from '../public/comments/commentsTypes/commentQweryType';
 import { CommentsViewForBloggerType } from './comments/types/commentsViewForBloggerType';
+import {
+  BanStatus,
+  BanStatusEntity,
+} from './banStatus/domain/banStatus.schema';
+import { BannedUsersForBlogType } from './users/types/bannedUsersForBlogType';
 
 @Injectable()
 export class BloggerQueryRepository {
   constructor(
     @InjectModel(Post.name) private postModel: Model<PostEntity>,
     @InjectModel(Comment.name) private commentModel: Model<CommentEntity>,
+    @InjectModel(BanStatus.name) private banStatusModel: Model<BanStatusEntity>,
   ) {}
 
   async findAllCommentsForAllPosts(
@@ -63,5 +69,40 @@ export class BloggerQueryRepository {
       totalCount: totalCount,
       items: result,
     };
+  }
+
+  async findBannedUserForBlog(
+    blogId: string,
+    query,
+  ): Promise<BannedUsersForBlogType | null> {
+    const loginFilter = this.makeLoginFilter(blogId, query.searchLoginTerm);
+    //get array od banned users by blog id
+    const bannedUsers = await this.banStatusModel
+      .find(loginFilter)
+      .sort({ [query.sortBy]: query.sortDirection })
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .limit(query.pageSize)
+      .lean();
+    if (!bannedUsers) return null;
+    // count number of banned users
+    const totalCount = await this.banStatusModel.count({ blogId });
+    const result = bannedUsers.map((u) => ({
+      id: u.userInfo.userId,
+      login: u.userInfo.userLogin,
+      banInfo: u.banInfo,
+    }));
+    return {
+      pagesCount: Math.ceil(totalCount / query.pageSize),
+      page: query.pageNumber,
+      pageSize: query.pageSize,
+      totalCount: totalCount,
+      items: result,
+    };
+  }
+
+  makeLoginFilter(blogId: string, login?: string | undefined) {
+    if (login)
+      return { blogId, 'userInfo.userLogin': { $regex: login, $options: 'i' } };
+    return { blogId };
   }
 }

@@ -45,15 +45,11 @@ export class CommentsQweryRepository {
     userId?: string | undefined | null,
   ): Promise<CommentViewType | undefined> {
     //found comment by id
-    const comment = await this.commentModel
-      .findOne({
-        _id: new Types.ObjectId(commentId),
-        isOwnerBanned: false,
-      })
-      .populate('post')
-      .exec();
+    const comment = await this.commentModel.findOne({
+      _id: new Types.ObjectId(commentId),
+      isOwnerBanned: false,
+    });
 
-    console.log('comment: ', comment);
     if (!comment) return undefined;
     //make view type and count the number of likes for this comment
     const result = await this.makeViewComment(comment, userId);

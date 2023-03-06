@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentsRepository } from '../../comments/repositories/comments.repository';
 import { PostsRepository } from '../../../blogger/posts/repositories/posts.repository';
 import { UsersRepository } from '../../../superAdmin/users/repositories/users.repository';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
 export class CreateCommentCommand {
   constructor(
@@ -32,7 +32,7 @@ export class CreateCommentUseCase
       post.blogId,
     );
     if (isUserBanned)
-      throw new NotFoundException('You can`t comment this post');
+      throw new ForbiddenException('You can`t comment this post');
 
     // find user by id
     const user = await this.usersRepository.findUserById(command.userId);

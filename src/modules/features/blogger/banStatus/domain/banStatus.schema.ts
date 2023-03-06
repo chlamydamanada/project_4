@@ -2,6 +2,7 @@ import { HydratedDocument } from 'mongoose';
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { BanInfoType } from '../../../superAdmin/users/usersTypes/banInfoType';
 import { BanStatusUserInfoType } from '../types/banStatusUserInfoType';
+import { CreateBanStatusByBloggerType } from '../../users/types/createBanStatusByBloggerType';
 
 export type BanStatusEntity = HydratedDocument<BanStatus>;
 
@@ -30,14 +31,20 @@ export class BanStatus {
   )
   userInfo: BanStatusUserInfoType;
 
-  createBanStatus(dto) {
-    this.bloggerId = dto.bloggerId;
-    this.blogId = dto.blogId;
+  createBanStatus(
+    bloggerId: string,
+    blogId: string,
+    banReason: string,
+    userId: string,
+    userLogin: string,
+  ) {
+    this.bloggerId = bloggerId;
+    this.blogId = blogId;
     this.banInfo.isBanned = true;
     this.banInfo.banDate = new Date().toISOString();
-    this.banInfo.banReason = dto.banReason;
-    this.userInfo.userId = dto.userId;
-    this.userInfo.userLogin = dto.userLogin;
+    this.banInfo.banReason = banReason;
+    this.userInfo.userId = userId;
+    this.userInfo.userLogin = userLogin;
   }
 }
 export const BanStatusSchema = SchemaFactory.createForClass(BanStatus);
