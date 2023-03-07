@@ -1,8 +1,23 @@
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, SchemaTypes, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { creatingBlogDtoType } from '../types/creatingBlogDtoType';
+import { BannedUserForBlogType } from '../types/bannedUserForBlogType';
 
 export type BlogEntity = HydratedDocument<Blog>;
+@Schema({ validateBeforeSave: true })
+class BannedUser {
+  @Prop({ required: true, type: SchemaTypes.ObjectId })
+  _id: Types.ObjectId;
+  @Prop({ required: true })
+  login: string;
+  @Prop({ required: true })
+  isBanned: boolean;
+  @Prop({ required: true })
+  banDate: string;
+  @Prop({ required: true })
+  banReason: string;
+}
+const BannedUserSchema = SchemaFactory.createForClass(BannedUser);
 
 @Schema()
 export class Blog {
@@ -39,6 +54,9 @@ export class Blog {
   @Prop({ type: String })
   banDate: string | null;
 
+  @Prop({ type: [BannedUserSchema], required: true })
+  bannedUsers: BannedUser[];
+
   createBlog(blogDto: creatingBlogDtoType) {
     this.ownerId = blogDto.bloggerId;
     this.ownerLogin = blogDto.bloggerLogin;
@@ -50,6 +68,7 @@ export class Blog {
     this.isOwnerBanned = false;
     this.isBanned = false;
     this.banDate = null;
+    this.bannedUsers = [];
   }
   updateBlog(blogDto) {
     this.name = blogDto.name;
@@ -71,6 +90,21 @@ export class Blog {
       this.banDate = null;
     }
   }
+  addBannedUserForBlog(user: BannedUserForBlogType) {
+    this.bannedUsers.push({
+      _id: user.id,
+      login: user.login,
+      isBanned: user.isBanned,
+      banDate: user.banDate,
+      banReason: user.banReason,
+    });
+    console.log('user = ', user);
+  }
+  deleteBannedUserFormBlog(userId: string) {
+    this.bannedUsers = this.bannedUsers.filter(
+      (u) => u._id.toString() !== userId.toString(),
+    );
+  }
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);
@@ -79,5 +113,7 @@ BlogSchema.methods = {
   updateBlog: Blog.prototype.updateBlog,
   updateOwnerId: Blog.prototype.updateOwnerId,
   banOrUnbanBlog: Blog.prototype.banOrUnbanBlog,
+  addBannedUserForBlog: Blog.prototype.addBannedUserForBlog,
+  deleteBannedUserFormBlog: Blog.prototype.deleteBannedUserFormBlog,
 };
 export const BlogModel = { name: Blog.name, schema: BlogSchema };

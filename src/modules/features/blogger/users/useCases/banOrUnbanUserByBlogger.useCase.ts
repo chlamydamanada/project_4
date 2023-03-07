@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { BlogsRepository } from '../../blogs/repositories/blogs.repository';
 import { BanStatusByBloggerDtoType } from '../types/banStatusByBloggerDtoType';
-import { UsersForBloggerRepository } from '../repositories/usersForBlogger.repositoryMongo';
+import { UsersRepository } from '../../../superAdmin/users/repositories/users.repository';
 
 export class BanOrUnbanUserByBloggerCommand {
   constructor(public banStatusDto: BanStatusByBloggerDtoType) {}
@@ -13,7 +13,7 @@ export class BanOrUnbanUserByBloggerUseCase
   implements ICommandHandler<BanOrUnbanUserByBloggerCommand>
 {
   constructor(
-    private readonly usersRepository: UsersForBloggerRepository,
+    private readonly usersRepository: UsersRepository,
     private readonly blogsRepository: BlogsRepository,
   ) {}
   async execute(command: BanOrUnbanUserByBloggerCommand): Promise<void> {
@@ -30,23 +30,24 @@ export class BanOrUnbanUserByBloggerUseCase
     //check is blogger owner of this blog
     if (blog.ownerId !== command.banStatusDto.bloggerId)
       throw new ForbiddenException('You can`t ban user for this blog');
+    // ban user for specific blog
 
     if (command.banStatusDto.isBanned) {
-      const banStatus = await this.usersRepository.getBanStatusEntity();
-      banStatus.createBanStatus(
-        command.banStatusDto.bloggerId,
-        command.banStatusDto.blogId,
-        command.banStatusDto.banReason,
-        command.banStatusDto.userId,
-        user.login,
-      );
-      await this.usersRepository.banUserByBlogger(banStatus);
+      // create user and ban info
+      const bannedUser = {
+        id: user._id,
+        login: user.login,
+        isBanned: true,
+        banDate: new Date().toISOString(),
+        banReason: command.banStatusDto.banReason,
+      };
+      //ban user
+      blog.addBannedUserForBlog(bannedUser);
+      await this.blogsRepository.saveBlog(blog);
     }
-    await this.usersRepository.unbanUserByBlogger(
-      command.banStatusDto.userId,
-      command.banStatusDto.blogId,
-    );
-
+    //unban user for specific blog
+    blog.deleteBannedUserFormBlog(command.banStatusDto.userId);
+    await this.blogsRepository.saveBlog(blog);
     return;
   }
 }

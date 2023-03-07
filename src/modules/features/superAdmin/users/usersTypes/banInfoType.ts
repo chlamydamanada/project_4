@@ -1,5 +1,5 @@
 export type BanInfoType = {
   isBanned: boolean;
-  banDate: string;
-  banReason: string;
+  banDate: string | null;
+  banReason: string | null;
 };

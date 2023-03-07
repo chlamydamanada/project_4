@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Post, PostEntity } from './posts/domain/post.schema';
 import {
   Comment,
@@ -8,18 +8,15 @@ import {
 } from '../public/comments/domain/comment.schema';
 import { commentQueryType } from '../public/comments/commentsTypes/commentQweryType';
 import { CommentsViewForBloggerType } from './comments/types/commentsViewForBloggerType';
-import {
-  BanStatus,
-  BanStatusEntity,
-} from './banStatus/domain/banStatus.schema';
-import { BannedUsersForBlogType } from './users/types/bannedUsersForBlogType';
+import { BannedUserQueryDtoType } from './blogs/types/bannedUserQueryDtoType';
+import { Blog, BlogEntity } from './blogs/domain/blog.schema';
 
 @Injectable()
 export class BloggerQueryRepository {
   constructor(
     @InjectModel(Post.name) private postModel: Model<PostEntity>,
     @InjectModel(Comment.name) private commentModel: Model<CommentEntity>,
-    @InjectModel(BanStatus.name) private banStatusModel: Model<BanStatusEntity>,
+    @InjectModel(Blog.name) private blogModel: Model<BlogEntity>,
   ) {}
 
   async findAllCommentsForAllPosts(
@@ -73,20 +70,21 @@ export class BloggerQueryRepository {
 
   async findBannedUserForBlog(
     blogId: string,
-    query,
-  ): Promise<BannedUsersForBlogType | null> {
+    query: BannedUserQueryDtoType,
+  ) /*: Promise<BannedUsersForBlogType | null>*/ {
     const loginFilter = this.makeLoginFilter(blogId, query.searchLoginTerm);
-    //get array od banned users by blog id
-    const bannedUsers = await this.banStatusModel
-      .find(loginFilter)
-      .sort({ [query.sortBy]: query.sortDirection })
+    //get array of banned users by blog id
+    const bannedUsers = await this.blogModel
+      .find({ _id: new Types.ObjectId(blogId) })
+      .sort({ [`bannedUsers.${query.sortBy}`]: query.sortDirection })
       .skip((query.pageNumber - 1) * query.pageSize)
       .limit(query.pageSize)
       .lean();
+    console.log('bannedUsers: ', bannedUsers);
     if (!bannedUsers) return null;
     // count number of banned users
-    const totalCount = await this.banStatusModel.count({ blogId });
-    const result = bannedUsers.map((u) => ({
+    const totalCount = await this.blogModel.count(loginFilter);
+    /*const result = bannedUsers.map((u) => ({
       id: u.userInfo.userId,
       login: u.userInfo.userLogin,
       banInfo: u.banInfo,
@@ -96,13 +94,21 @@ export class BloggerQueryRepository {
       page: query.pageNumber,
       pageSize: query.pageSize,
       totalCount: totalCount,
-      items: result,
-    };
+      items: {},
+    };*/
+    return;
   }
 
   makeLoginFilter(blogId: string, login?: string | undefined) {
     if (login)
-      return { blogId, 'userInfo.userLogin': { $regex: login, $options: 'i' } };
-    return { blogId };
+      return {
+        _id: new Types.ObjectId(blogId),
+        'bannedUsers.login': { $regex: login, $options: 'i' },
+        bannedUsers: { $elemMatch: { isBanned: true } },
+      };
+    return {
+      _id: new Types.ObjectId(blogId),
+      bannedUsers: { $elemMatch: { isBanned: true } },
+    };
   }
 }

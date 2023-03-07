@@ -1,8 +1,9 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { sortingDirection } from '../../../../../../helpers/helperFunctions/sortingDerection';
 
 export class BannedUserQueryDtoPipe {
+  @IsString()
   @IsOptional()
   searchLoginTerm: string | undefined;
 
@@ -16,8 +17,9 @@ export class BannedUserQueryDtoPipe {
   @IsOptional()
   pageSize = 10;
 
+  @IsString()
   @IsOptional()
-  sortBy = 'banInfo.banDate';
+  sortBy = 'banDate';
 
   @IsOptional()
   @Transform(({ value }) => sortingDirection(value))

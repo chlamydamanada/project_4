@@ -38,6 +38,7 @@ import { BanStatusByBloggerPipe } from './users/api/pipes/banStatusByBloggerPipe
 import { BanOrUnbanUserByBloggerCommand } from './users/useCases/banOrUnbanUserByBlogger.useCase';
 import { BannedUserQueryDtoPipe } from './users/api/pipes/bannedUserQueryDtoPipe';
 import { BannedUsersForBlogType } from './users/types/bannedUsersForBlogType';
+import { BannedUserQueryDtoType } from './blogs/types/bannedUserQueryDtoType';
 
 @UseGuards(AccessTokenGuard)
 @Controller('blogger')
@@ -179,7 +180,9 @@ export class BloggerController {
       new BanOrUnbanUserByBloggerCommand({
         userId,
         bloggerId,
-        ...banUserInputDto,
+        isBanned: banUserInputDto.isBanned,
+        banReason: banUserInputDto.banReason,
+        blogId: banUserInputDto.blogId,
       }),
     );
     return;
@@ -189,10 +192,10 @@ export class BloggerController {
   async getBannedUsersForBlog(
     @Param('blogId') blogId: string,
     @Query() query: BannedUserQueryDtoPipe,
-  ): Promise<BannedUsersForBlogType> {
+  ) /*: Promise<BannedUsersForBlogType> */ {
     const bannedUsers = await this.bloggerQueryRepository.findBannedUserForBlog(
       blogId,
-      query,
+      query as BannedUserQueryDtoType,
     );
     if (!bannedUsers) throw new NotFoundException('You haven`t banned users');
     return bannedUsers;
