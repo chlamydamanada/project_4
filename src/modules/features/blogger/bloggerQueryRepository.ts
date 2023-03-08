@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Post, PostEntity } from './posts/domain/post.schema';
@@ -10,6 +14,7 @@ import { commentQueryType } from '../public/comments/commentsTypes/commentQweryT
 import { CommentsViewForBloggerType } from './comments/types/commentsViewForBloggerType';
 import { BannedUserQueryDtoType } from './blogs/types/bannedUserQueryDtoType';
 import { Blog, BlogEntity } from './blogs/domain/blog.schema';
+import { BannedUsersForBlogType } from './users/types/bannedUsersForBlogType';
 
 @Injectable()
 export class BloggerQueryRepository {
@@ -69,9 +74,18 @@ export class BloggerQueryRepository {
   }
 
   async findBannedUserForBlog(
+    bloggerId: string,
     blogId: string,
-    query: BannedUserQueryDtoType, //: Promise<BannedUsersForBlogType | null>
-  ) {
+    query: BannedUserQueryDtoType,
+  ): Promise<BannedUsersForBlogType | null> {
+    //check does blog exist
+    const blog = await this.blogModel.findOne({
+      _id: new Types.ObjectId(blogId),
+    });
+    if (!blog) throw new NotFoundException('Blog with this id doesn`t exist');
+    // check is blogger owner of blog
+    if (blog.ownerId !== bloggerId)
+      throw new ForbiddenException('You haven`t blog with this id');
     //get array of banned users by blog id
     const bannedUsers = await this.blogModel.aggregate([
       {
@@ -113,7 +127,7 @@ export class BloggerQueryRepository {
         $limit: query.pageSize,
       },
     ]);
-    if (!bannedUsers) return null;
+    if (bannedUsers.length < 1) return null;
     //mapping to view form
     const result = bannedUsers.map((u) => ({
       id: u.userId,

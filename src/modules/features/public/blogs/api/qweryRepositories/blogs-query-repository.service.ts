@@ -45,6 +45,7 @@ export class BlogsQueryRepository {
     // used by users to see special blog
     const blog = await this.blogModel.findOne({
       _id: new Types.ObjectId(blogId),
+      isBanned: false,
     });
     if (!blog) return undefined;
     return this.makeViewBlog(blog);
@@ -132,13 +133,18 @@ export class BlogsQueryRepository {
         name: { $regex: name, $options: 'i' },
         ownerId: bloggerId,
         isOwnerBanned: false,
+        isBanned: false,
       };
     }
     if (name) {
-      return { name: { $regex: name, $options: 'i' }, isOwnerBanned: false };
+      return {
+        name: { $regex: name, $options: 'i' },
+        isOwnerBanned: false,
+        isBanned: false,
+      };
     }
     if (bloggerId) {
-      return { ownerId: bloggerId, isOwnerBanned: false };
+      return { ownerId: bloggerId, isOwnerBanned: false, isBanned: false };
     }
     return { isOwnerBanned: false };
   }

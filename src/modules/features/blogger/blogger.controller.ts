@@ -191,9 +191,11 @@ export class BloggerController {
   @Get('users/blog/:blogId')
   async getBannedUsersForBlog(
     @Param('blogId') blogId: string,
-    @Query() query: BannedUserQueryDtoPipe, //: Promise<BannedUsersForBlogType>
-  ) {
+    @Query() query: BannedUserQueryDtoPipe,
+    @CurrentUserId() bloggerId: string,
+  ): Promise<BannedUsersForBlogType> {
     const bannedUsers = await this.bloggerQueryRepository.findBannedUserForBlog(
+      bloggerId,
       blogId,
       query as BannedUserQueryDtoType,
     );
