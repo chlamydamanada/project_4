@@ -6,6 +6,11 @@ export type CommentViewForBloggerType = {
     userLogin: string;
   };
   createdAt: string;
+  likesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: string;
+  };
   postInfo: {
     id: string;
     title: string;

@@ -151,8 +151,8 @@ export class BlogsQueryRepository {
 
   makeNameFilter(name: string | undefined) {
     if (name) {
-      return { name: { $regex: name, $options: 'i' } };
+      return { name: { $regex: name, $options: 'i' }, isBanned: false };
     }
-    return {};
+    return { isBanned: false };
   }
 }

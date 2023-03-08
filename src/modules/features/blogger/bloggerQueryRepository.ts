@@ -15,6 +15,7 @@ import { CommentsViewForBloggerType } from './comments/types/commentsViewForBlog
 import { BannedUserQueryDtoType } from './blogs/types/bannedUserQueryDtoType';
 import { Blog, BlogEntity } from './blogs/domain/blog.schema';
 import { BannedUsersForBlogType } from './users/types/bannedUsersForBlogType';
+import { Status, StatusEntity } from '../public/status/domain/status.schema';
 
 @Injectable()
 export class BloggerQueryRepository {
@@ -22,6 +23,7 @@ export class BloggerQueryRepository {
     @InjectModel(Post.name) private postModel: Model<PostEntity>,
     @InjectModel(Comment.name) private commentModel: Model<CommentEntity>,
     @InjectModel(Blog.name) private blogModel: Model<BlogEntity>,
+    @InjectModel(Status.name) private statusModel: Model<StatusEntity>,
   ) {}
 
   async findAllCommentsForAllPosts(
@@ -45,25 +47,54 @@ export class BloggerQueryRepository {
       isOwnerBanned: false,
     });
     // get array of comments in view form for blogger
-    const result = comments.map((c) => {
-      //find post by id to comment from array of posts
-      const post = posts.find((p) => p._id.toString() === c.postId);
-      return {
-        id: c._id.toString(),
-        content: c.content,
-        commentatorInfo: {
-          userId: c.userId,
-          userLogin: c.userLogin,
-        },
-        createdAt: c.createdAt,
-        postInfo: {
-          id: post!._id.toString(),
-          title: post!.title,
-          blogId: post!.blogId,
-          blogName: post!.blogName,
-        },
-      };
-    });
+    const result = await Promise.all(
+      comments.map(async (c) => {
+        //find post by id to comment from array of posts
+        const post = posts.find((p) => p._id.toString() === c.postId);
+        const comment = {
+          id: c._id.toString(),
+          content: c.content,
+          commentatorInfo: {
+            userId: c.userId,
+            userLogin: c.userLogin,
+          },
+          createdAt: c.createdAt,
+          likesInfo: {
+            likesCount: await this.statusModel.count({
+              entityId: c._id,
+              entity: 'comment',
+              status: 'Like',
+              isOwnerBanned: false,
+            }),
+            dislikesCount: await this.statusModel.count({
+              entityId: c._id,
+              entity: 'comment',
+              status: 'Dislike',
+              isOwnerBanned: false,
+            }),
+            myStatus: 'None',
+          },
+          postInfo: {
+            id: post!._id.toString(),
+            title: post!.title,
+            blogId: post!.blogId,
+            blogName: post!.blogName,
+          },
+        };
+        //if blogger have like status
+        const userReaction = await this.statusModel.findOne({
+          entityId: c._id,
+          entity: 'comment',
+          userId: bloggerId,
+        });
+        // and put this status to view model of comment
+        if (userReaction) {
+          comment.likesInfo.myStatus = userReaction.status;
+        }
+
+        return comment;
+      }),
+    );
     return {
       pagesCount: Math.ceil(totalCount / query.pageSize),
       page: query.pageNumber,
