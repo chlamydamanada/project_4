@@ -146,13 +146,13 @@ export class BlogsQueryRepository {
     if (bloggerId) {
       return { ownerId: bloggerId, isOwnerBanned: false, isBanned: false };
     }
-    return { isOwnerBanned: false };
+    return { isOwnerBanned: false, isBanned: false };
   }
 
   makeNameFilter(name: string | undefined) {
     if (name) {
-      return { name: { $regex: name, $options: 'i' }, isBanned: false };
+      return { name: { $regex: name, $options: 'i' } };
     }
-    return { isBanned: false };
+    return {};
   }
 }
