@@ -70,45 +70,67 @@ export class BloggerQueryRepository {
 
   async findBannedUserForBlog(
     blogId: string,
-    query: BannedUserQueryDtoType,
-  ) /*: Promise<BannedUsersForBlogType | null>*/ {
-    const loginFilter = this.makeLoginFilter(blogId, query.searchLoginTerm);
+    query: BannedUserQueryDtoType, //: Promise<BannedUsersForBlogType | null>
+  ) {
     //get array of banned users by blog id
-    const bannedUsers = await this.blogModel
-      .find({ _id: new Types.ObjectId(blogId) })
-      .sort({ [`bannedUsers.${query.sortBy}`]: query.sortDirection })
-      .skip((query.pageNumber - 1) * query.pageSize)
-      .limit(query.pageSize)
-      .lean();
-    console.log('bannedUsers: ', bannedUsers);
+    const bannedUsers = await this.blogModel.aggregate([
+      {
+        $match: { _id: new Types.ObjectId(blogId) },
+      },
+      {
+        $unwind: '$bannedUsers',
+      },
+      {
+        $match: {
+          'bannedUsers.login': {
+            $regex: query.searchLoginTerm ?? '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $sort: {
+          [`bannedUsers.${query.sortBy}`]: query.sortDirection,
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          id: '$bannedUsers.id',
+          login: '$bannedUsers.login',
+          isBanned: '$bannedUsers.isBanned',
+          banDate: '$bannedUsers.banDate',
+          banReason: '$bannedUsers.banReason',
+        },
+      },
+      {
+        $setWindowFields: { output: { totalCount: { $count: {} } } },
+      },
+      {
+        $skip: (query.pageNumber - 1) * query.pageSize,
+      },
+      {
+        $limit: query.pageSize,
+      },
+    ]);
     if (!bannedUsers) return null;
-    // count number of banned users
-    const totalCount = await this.blogModel.count(loginFilter);
-    /*const result = bannedUsers.map((u) => ({
-      id: u.userInfo.userId,
-      login: u.userInfo.userLogin,
-      banInfo: u.banInfo,
+    console.log('blog: ', bannedUsers);
+
+    const result = bannedUsers.map((u) => ({
+      id: u.userId,
+      login: u.login,
+      banInfo: {
+        isBanned: true,
+        banDate: u.banDate,
+        banReason: u.banReason,
+      },
     }));
     return {
-      pagesCount: Math.ceil(totalCount / query.pageSize),
+      pagesCount: Math.ceil(bannedUsers[0].totalCount / query.pageSize),
       page: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount: totalCount,
-      items: {},
-    };*/
-    return;
-  }
-
-  makeLoginFilter(blogId: string, login?: string | undefined) {
-    if (login)
-      return {
-        _id: new Types.ObjectId(blogId),
-        'bannedUsers.login': { $regex: login, $options: 'i' },
-        bannedUsers: { $elemMatch: { isBanned: true } },
-      };
-    return {
-      _id: new Types.ObjectId(blogId),
-      bannedUsers: { $elemMatch: { isBanned: true } },
+      totalCount: bannedUsers[0].totalCount,
+      items: result,
     };
   }
 }

@@ -4,6 +4,7 @@ import { CommentsRepository } from '../../comments/repositories/comments.reposit
 import { PostsRepository } from '../../../blogger/posts/repositories/posts.repository';
 import { UsersRepository } from '../../../superAdmin/users/repositories/users.repository';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BlogsRepository } from '../../../blogger/blogs/repositories/blogs.repository';
 
 export class CreateCommentCommand {
   constructor(
@@ -20,6 +21,7 @@ export class CreateCommentUseCase
     private readonly commentsRepository: CommentsRepository,
     private readonly postsRepository: PostsRepository,
     private readonly usersRepository: UsersRepository,
+    private readonly blogsRepository: BlogsRepository,
   ) {}
   async execute(command: CreateCommentCommand): Promise<string> {
     // find post by id and check does it exist
@@ -27,7 +29,7 @@ export class CreateCommentUseCase
     if (!post) throw new NotFoundException('Post with this id does not exist');
 
     //check is user banned by blogger
-    const isUserBanned = await this.usersRepository.isUserBannedForBlog(
+    const isUserBanned = await this.blogsRepository.isUserBannedByBlogger(
       command.userId,
       post.blogId,
     );

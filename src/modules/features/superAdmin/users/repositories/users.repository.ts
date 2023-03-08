@@ -88,13 +88,4 @@ export class UsersRepository {
     if (!user) return undefined;
     return user;
   }
-
-  async isUserBannedForBlog(userId: string, blogId: string): Promise<boolean> {
-    const status = await this.banStatusModel.findOne({
-      blogId,
-      'userInfo.userId': userId,
-    });
-    if (!status) return false;
-    return true;
-  }
 }

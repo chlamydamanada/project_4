@@ -1,7 +1,5 @@
-import { Types } from 'mongoose';
-
 export type BannedUserForBlogType = {
-  id: Types.ObjectId;
+  id: string;
   login: string;
   isBanned: boolean;
   banDate: string;

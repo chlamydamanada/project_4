@@ -23,7 +23,7 @@ export class UsersForBloggerRepository {
     if (!user) return null;
     return user;
   }
-  async getBanStatusEntity(): Promise<BanStatusEntity> {
+  getBanStatusEntity(): BanStatusEntity {
     return new this.banStatusModel();
   }
   async banUserByBlogger(status: BanStatusEntity): Promise<void> {
@@ -33,5 +33,15 @@ export class UsersForBloggerRepository {
   async unbanUserByBlogger(userId: string, blogId: string): Promise<void> {
     await this.banStatusModel.deleteOne({ blogId, 'userInfo.userId': userId });
     return;
+  }
+  async isUserBannedForBlog(userId: string, blogId: string): Promise<boolean> {
+    const status = await this.banStatusModel
+      .findOne({
+        blogId,
+        userId,
+      })
+      .lean();
+    if (!status) return false;
+    return true;
   }
 }

@@ -1,8 +1,5 @@
 import { HydratedDocument } from 'mongoose';
-import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { BanInfoType } from '../../../superAdmin/users/usersTypes/banInfoType';
-import { BanStatusUserInfoType } from '../types/banStatusUserInfoType';
-import { CreateBanStatusByBloggerType } from '../../users/types/createBanStatusByBloggerType';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type BanStatusEntity = HydratedDocument<BanStatus>;
 
@@ -14,22 +11,20 @@ export class BanStatus {
   @Prop({ required: true })
   blogId: string;
 
-  @Prop(
-    raw({
-      isBanned: { required: true, type: Boolean },
-      banDate: { required: true, type: String },
-      banReason: { required: true, type: String },
-    }),
-  )
-  banInfo: BanInfoType;
+  @Prop({ required: true })
+  isBanned: boolean;
 
-  @Prop(
-    raw({
-      userLogin: { required: true, type: String },
-      userId: { required: true, type: String },
-    }),
-  )
-  userInfo: BanStatusUserInfoType;
+  @Prop({ required: true })
+  banDate: string;
+
+  @Prop({ required: true })
+  banReason: string;
+
+  @Prop({ required: true })
+  login: string;
+
+  @Prop({ required: true })
+  userId: string;
 
   createBanStatus(
     bloggerId: string,
@@ -40,11 +35,11 @@ export class BanStatus {
   ) {
     this.bloggerId = bloggerId;
     this.blogId = blogId;
-    this.banInfo.isBanned = true;
-    this.banInfo.banDate = new Date().toISOString();
-    this.banInfo.banReason = banReason;
-    this.userInfo.userId = userId;
-    this.userInfo.userLogin = userLogin;
+    this.isBanned = true;
+    this.banDate = new Date().toISOString();
+    this.banReason = banReason;
+    this.userId = 'userId';
+    this.login = userLogin;
   }
 }
 export const BanStatusSchema = SchemaFactory.createForClass(BanStatus);

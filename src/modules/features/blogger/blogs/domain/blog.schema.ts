@@ -1,13 +1,12 @@
-import mongoose, { HydratedDocument, SchemaTypes, Types } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { creatingBlogDtoType } from '../types/creatingBlogDtoType';
 import { BannedUserForBlogType } from '../types/bannedUserForBlogType';
 
-export type BlogEntity = HydratedDocument<Blog>;
-@Schema({ validateBeforeSave: true })
-class BannedUser {
-  @Prop({ required: true, type: SchemaTypes.ObjectId })
-  _id: Types.ObjectId;
+@Schema({ _id: false, validateBeforeSave: true })
+export class BannedUser {
+  @Prop({ required: true })
+  id: string;
   @Prop({ required: true })
   login: string;
   @Prop({ required: true })
@@ -19,11 +18,10 @@ class BannedUser {
 }
 const BannedUserSchema = SchemaFactory.createForClass(BannedUser);
 
+export type BlogEntity = HydratedDocument<Blog>;
+
 @Schema()
 export class Blog {
-  //@Prop({ type: SchemaTypes.ObjectId })
-  //_id: ObjectId;
-
   @Prop({ required: true })
   ownerId: string;
 
@@ -90,19 +88,19 @@ export class Blog {
       this.banDate = null;
     }
   }
-  addBannedUserForBlog(user: BannedUserForBlogType) {
-    this.bannedUsers.push({
-      _id: user.id,
-      login: user.login,
-      isBanned: user.isBanned,
-      banDate: user.banDate,
-      banReason: user.banReason,
-    });
-    console.log('user = ', user);
+  async addBannedUserForBlog(user: BannedUserForBlogType) {
+    //check is user already banned
+    const isBanned = this.bannedUsers.find((u) => u.id === user.id);
+    if (!isBanned) {
+      // add banned user
+      this.bannedUsers.push(user);
+      console.log('user = ', user);
+    }
+    return;
   }
-  deleteBannedUserFormBlog(userId: string) {
+  async deleteBannedUserFormBlog(userId: string) {
     this.bannedUsers = this.bannedUsers.filter(
-      (u) => u._id.toString() !== userId.toString(),
+      (u) => u.id.toString() !== userId.toString(),
     );
   }
 }
