@@ -114,8 +114,7 @@ export class BloggerQueryRepository {
       },
     ]);
     if (!bannedUsers) return null;
-    console.log('blog: ', bannedUsers);
-
+    //mapping to view form
     const result = bannedUsers.map((u) => ({
       id: u.userId,
       login: u.login,
