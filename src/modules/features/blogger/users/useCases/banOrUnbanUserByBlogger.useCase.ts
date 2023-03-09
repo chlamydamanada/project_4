@@ -3,7 +3,6 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { BlogsRepository } from '../../blogs/repositories/blogs.repository';
 import { BanStatusByBloggerDtoType } from '../types/banStatusByBloggerDtoType';
 import { UsersRepository } from '../../../superAdmin/users/repositories/users.repository';
-import { UsersForBloggerRepository } from '../repositories/usersForBlogger.repositoryMongo';
 
 export class BanOrUnbanUserByBloggerCommand {
   constructor(public banStatusDto: BanStatusByBloggerDtoType) {}
@@ -16,7 +15,6 @@ export class BanOrUnbanUserByBloggerUseCase
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly blogsRepository: BlogsRepository,
-    private readonly usersForBloggerRepository: UsersForBloggerRepository,
   ) {}
   async execute(command: BanOrUnbanUserByBloggerCommand): Promise<void> {
     // check does the user exist
@@ -45,7 +43,7 @@ export class BanOrUnbanUserByBloggerUseCase
         banDate: new Date().toISOString(),
         banReason: command.banStatusDto.banReason,
       });
-      console.log('isBlog.bannedUsers', blog.bannedUsers);
+      //console.log('isBlog.bannedUsers', blog.bannedUsers);
       await this.blogsRepository.saveBlog(blog);
       return;
     }
