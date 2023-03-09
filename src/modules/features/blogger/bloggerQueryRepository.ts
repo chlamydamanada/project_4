@@ -149,9 +149,7 @@ export class BloggerQueryRepository {
           banReason: '$bannedUsers.banReason',
         },
       },
-      {
-        $setWindowFields: { output: { totalCount: { $count: {} } } },
-      },
+      { $setWindowFields: { output: { totalCount: { $count: {} } } } },
       {
         $skip: (query.pageNumber - 1) * query.pageSize,
       },
@@ -179,12 +177,16 @@ export class BloggerQueryRepository {
         banReason: u.banReason,
       },
     }));
-
+    console.log('totalCount', bannedUsers[0].totalCount);
+    console.log(
+      'pagesCount:',
+      Math.ceil(bannedUsers[0].totalCount / query.pageSize),
+    );
     return {
-      pagesCount: Math.ceil(bannedUsers[0].totalCount ?? 0 / query.pageSize),
+      pagesCount: Math.ceil(bannedUsers[0].totalCount / query.pageSize),
       page: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount: bannedUsers[0].totalCount ?? 0,
+      totalCount: bannedUsers[0].totalCount,
       items: result,
     };
   }
