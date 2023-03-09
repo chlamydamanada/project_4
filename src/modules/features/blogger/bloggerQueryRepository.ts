@@ -108,7 +108,7 @@ export class BloggerQueryRepository {
     bloggerId: string,
     blogId: string,
     query: BannedUserQueryDtoType,
-  ): Promise<BannedUsersForBlogType | null> {
+  ): Promise<BannedUsersForBlogType> {
     //check does blog exist
     const blog = await this.blogModel.findOne({
       _id: new Types.ObjectId(blogId),
@@ -159,7 +159,8 @@ export class BloggerQueryRepository {
         $limit: query.pageSize,
       },
     ]);
-    if (bannedUsers.length < 1) return null;
+    if (bannedUsers.length < 1)
+      throw new NotFoundException('You haven`t banned users');
     //mapping to view form
     const result = bannedUsers.map((u) => ({
       id: u.id,

@@ -199,7 +199,6 @@ export class BloggerController {
       blogId,
       query as BannedUserQueryDtoType,
     );
-    if (!bannedUsers) throw new NotFoundException('You haven`t banned users');
     return bannedUsers;
   }
 }
