@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { creatingBlogDtoType } from '../types/creatingBlogDtoType';
 import { BannedUserForBlogType } from '../types/bannedUserForBlogType';
 
-@Schema({ _id: false, validateBeforeSave: true })
+@Schema({ validateBeforeSave: true })
 export class BannedUser {
   @Prop({ required: true })
   id: string;

@@ -113,7 +113,7 @@ export class BloggerQueryRepository {
     const blog = await this.blogModel.findOne({
       _id: new Types.ObjectId(blogId),
     });
-    console.log('banned users in blog:', blog?.bannedUsers);
+
     if (!blog) throw new NotFoundException('Blog with this id doesn`t exist');
     // check is blogger owner of blog
     if (blog.ownerId !== bloggerId)
@@ -159,8 +159,16 @@ export class BloggerQueryRepository {
         $limit: query.pageSize,
       },
     ]);
+    // if blogger haven`t banned users
     if (bannedUsers.length < 1)
-      throw new NotFoundException('You haven`t banned users');
+      return {
+        pagesCount: 0,
+        page: query.pageNumber,
+        pageSize: query.pageSize,
+        totalCount: 0,
+        items: [],
+      };
+
     //mapping to view form
     const result = bannedUsers.map((u) => ({
       id: u.id,
@@ -171,12 +179,12 @@ export class BloggerQueryRepository {
         banReason: u.banReason,
       },
     }));
-    console.log('result', result);
+
     return {
-      pagesCount: Math.ceil(bannedUsers[0].totalCount / query.pageSize),
+      pagesCount: Math.ceil(bannedUsers[0].totalCount ?? 0 / query.pageSize),
       page: query.pageNumber,
       pageSize: query.pageSize,
-      totalCount: bannedUsers[0].totalCount,
+      totalCount: bannedUsers[0].totalCount ?? 0,
       items: result,
     };
   }
